@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEPNOVA AI | Autonomous BIM Coordination</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #0A192F;
+            --bg-card: rgba(17, 34, 64, 0.9);
+            --accent-neon: #00FFFF;
+            --text-main: #8892b0;
+            --text-white: #e6f1ff;
+            --sidebar-width: 240px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { 
+            background-color: var(--bg-deep); 
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           1. SIDEBAR NAVIGATION
+           ========================================= */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: #020c1b;
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            display: flex; flex-direction: column;
+            border-right: 1px solid rgba(0, 255, 255, 0.1);
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 30px 25px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-neon);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-menu { flex-grow: 1; padding: 20px 0; }
+        .nav-item {
+            padding: 15px 25px;
+            display: flex; align-items: center;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: 0.2s;
+            gap: 15px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(0, 255, 255, 0.05);
+            color: var(--accent-neon);
+            border-left: 4px solid var(--accent-neon);
+        }
+
+        /* =========================================
+           2. MAIN CONTENT AREA
+           ========================================= */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            width: calc(100% - var(--sidebar-width));
+        }
+
+        /* Hero Background Section */
+        .hero-banner {
+            height: 400px;
+            width: 100%;
+            background: linear-gradient(rgba(10, 25, 47, 0.7), rgba(10, 25, 47, 0.9)), 
+                        url('http://googleusercontent.com/image_collection/image_retrieval/5925703051641039195_0');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            border-bottom: 2px solid var(--accent-neon);
+        }
+
+        .hero-text h1 { font-size: 3rem; color: var(--text-white); margin-bottom: 10px; }
+        .hero-text h1 span { color: var(--accent-neon); }
+
+        /* Top Bar Profile */
+        .top-bar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 40px;
+            position: absolute;
+            width: calc(100% - var(--sidebar-width));
+            z-index: 10;
+        }
+
+        .user-profile { display: flex; align-items: center; gap: 12px; color: white; cursor: pointer; }
+        .profile-img {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--accent-neon);
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--accent-neon);
+        }
+
+        /* Dashboard Content */
+        .dashboard-grid {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .ai-demo-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--accent-neon);
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .demo-gif-container {
+            width: 100%;
+            height: 350px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+            border: 1px solid #233554;
+        }
+
+        .demo-gif-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
+
+        .stat-group { display: grid; gap: 20px; }
+        .stat-card {
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #233554;
+        }
+
+        .value { font-size: 2rem; color: var(--accent-neon); font-weight: bold; }
+        
+        .badge {
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--accent-neon);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">MEPNOVA AI</div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> <span>Home</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-cube"></i> <span>BIM Models</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-bolt"></i> <span>AI Resolver</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Pricing</span></a>
+            <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i> <span>Contact</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" class="nav-item" style="color: #ff5f56;"><i class="fa-solid fa-power-off"></i> <span>Logout</span></a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="top-bar">
+            <div class="user-profile">
+                <span style="font-size: 0.9rem; font-weight: bold;">Engr. Sarah Smith</span>
+                <div class="profile-img">
+                    <i class="fa-solid fa-user-tie" style="color: #0A192F;"></i>
+                </div>
+            </div>
+        </header>
+
+        <section class="hero-banner">
+            <div class="hero-text">
+                <span class="badge">AI-Powered Engineering</span>
+                <h1>Solve BIM Clashes with <span>Precision</span></h1>
+                <p style="max-width: 600px; color: #ccd6f6;">MEPNOVA AI automates the coordination of Mechanical, Electrical, and Plumbing services using generative algorithms.</p>
+            </div>
+        </section>
+
+        <main class="dashboard-grid">
+            
+            <div class="ai-demo-card">
+                <h3 style="color: white;"><i class="fa-solid fa-microchip" style="color: var(--accent-neon);"></i> Live AI Solver Simulation</h3>
+                <p style="font-size: 0.85rem; margin-top: 5px;">Analyzing ductwork vs structural beams in Project: Terminal 3...</p>
+                <div class="demo-gif-container">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/4688270323657160780_0" alt="BIM MEP AI Resolution Demo">
+                </div>
+                <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: #27c93f; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> 14 Clashes Resolved Automatically</span>
+                    <button style="background: var(--accent-neon); color: #0A192F; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">Export to Revit</button>
+                </div>
+            </div>
+
+            <div class="stat-group">
+                <div class="stat-card">
+                    <h3 style="font-size: 0.9rem;">Global Coordination Score</h3>
+                    <div class="value">98.2%</div>
+                    <div style="width: 100%; height: 6px; background: #233554; border-radius: 3px; margin-top: 10px;">
+                        <div style="width: 98%; height: 100%; background: var(--accent-neon); border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3 style="font-size: 0.9rem;">International Payments</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; font-size: 1.2rem; color: var(--text-white);">
+                        <i class="fa-brands fa-cc-visa"></i>
+                        <i class="fa-brands fa-cc-mastercard"></i>
+                        <i class="fa-brands fa-cc-stripe"></i>
+                        <i class="fa-brands fa-cc-apple-pay"></i>
+                    </div>
+                    <p style="font-size: 0.7rem; margin-top: 10px;">Secure multi-currency processing enabled.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>
