@@ -1,245 +1,2160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEPNOVA AI | Autonomous BIM Coordination</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-deep: #0A192F;
-            --bg-card: rgba(17, 34, 64, 0.9);
-            --accent-neon: #00FFFF;
-            --text-main: #8892b0;
-            --text-white: #e6f1ff;
-            --sidebar-width: 240px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FluxCoord AI — Intelligent Coordination for Dynamic Systems</title>
+  <!-- Firebase SDK (compat v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    :root {
+      --purple-600: #7c3aed;
+      --purple-500: #8b5cf6;
+      --purple-400: #a78bfa;
+      --purple-300: #c4b5fd;
+      --purple-100: #ede9fe;
+      --pink-400: #f472b6;
+      --cyan-400: #22d3ee;
+      --dark-900: #0f0a1e;
+      --dark-800: #1a1030;
+      --dark-700: #251848;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --white: #ffffff;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(124,58,237,0.12);
+      --shadow-lg: 0 8px 40px rgba(124,58,237,0.18);
+    }
 
-        body { 
-            background-color: var(--bg-deep); 
-            color: var(--text-main);
-            display: flex;
-            min-height: 100vh;
-            body {
-  background-image: url("bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-}
-        }
+    html { scroll-behavior: smooth; }
 
-        /* =========================================
-           1. SIDEBAR NAVIGATION
-           ========================================= */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: #020c1b;
-            height: 100vh;
-            position: fixed;
-            left: 0; top: 0;
-            display: flex; flex-direction: column;
-            border-right: 1px solid rgba(0, 255, 255, 0.1);
-            z-index: 100;
-        }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--white);
+      color: var(--gray-900);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
 
-        .sidebar-logo {
-            padding: 30px 25px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent-neon);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 64px;
+      background: rgba(15, 10, 30, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(167,139,250,0.15);
+    }
+    .nav-logo {
+      font-size: 1.25rem; font-weight: 700; color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--purple-400); }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      color: rgba(255,255,255,0.7); text-decoration: none;
+      font-size: 0.9rem; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--purple-300); }
+    .nav-cta {
+      background: var(--purple-600); color: var(--white);
+      border: none; padding: 0.5rem 1.25rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      text-decoration: none;
+    }
+    .nav-cta:hover { background: var(--purple-500); transform: translateY(-1px); }
 
-        .nav-menu { flex-grow: 1; padding: 20px 0; }
-        .nav-item {
-            padding: 15px 25px;
-            display: flex; align-items: center;
-            color: var(--text-main);
-            text-decoration: none;
-            transition: 0.2s;
-            gap: 15px;
-        }
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--dark-900) 0%, var(--dark-800) 50%, #1e0a3c 100%);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; padding: 6rem 5% 4rem;
+    }
+    .hero-bg-nodes {
+      position: absolute; inset: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .node {
+      position: absolute; border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%);
+      animation: pulse 4s ease-in-out infinite;
+    }
+    .node:nth-child(1) { width: 500px; height: 500px; top: -100px; right: -100px; animation-delay: 0s; }
+    .node:nth-child(2) { width: 300px; height: 300px; bottom: 10%; left: -50px; animation-delay: 1.5s; }
+    .node:nth-child(3) { width: 200px; height: 200px; top: 30%; left: 20%; animation-delay: 3s; }
+    @keyframes pulse { 0%,100%{opacity:0.4;transform:scale(1)} 50%{opacity:0.7;transform:scale(1.08)} }
 
-        .nav-item:hover, .nav-item.active {
-            background: rgba(0, 255, 255, 0.05);
-            color: var(--accent-neon);
-            border-left: 4px solid var(--accent-neon);
-        }
+    /* Animated grid lines */
+    .hero-grid {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(139,92,246,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,92,246,0.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
 
-        /* =========================================
-           2. MAIN CONTENT AREA
-           ========================================= */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex-grow: 1;
-            width: calc(100% - var(--sidebar-width));
-        }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 760px; text-align: center;
+    }
+    .hero-badge {
+      display: inline-block; margin-bottom: 1.5rem;
+      background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.4);
+      color: var(--purple-300); padding: 0.35rem 1rem; border-radius: 999px;
+      font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 800;
+      color: var(--white); line-height: 1.15; letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--purple-400), var(--cyan-400));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.15rem; color: rgba(255,255,255,0.65);
+      max-width: 580px; margin: 0 auto 2.5rem;
+    }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+      color: var(--white); padding: 0.85rem 2rem; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; cursor: pointer; border: none;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.45);
+      transition: transform 0.15s, box-shadow 0.15s; text-decoration: none;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.55); }
+    .btn-secondary {
+      background: transparent; color: var(--white);
+      border: 1.5px solid rgba(167,139,250,0.5);
+      padding: 0.85rem 2rem; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; text-decoration: none;
+    }
+    .btn-secondary:hover { border-color: var(--purple-400); background: rgba(139,92,246,0.1); }
 
-        /* Hero Background Section */
-        .hero-banner {
-            height: 400px;
-            width: 100%;
-            background: linear-gradient(rgba(10, 25, 47, 0.7), rgba(10, 25, 47, 0.9)), 
-                        url('http://googleusercontent.com/image_collection/image_retrieval/5925703051641039195_0');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            padding: 0 40px;
-            border-bottom: 2px solid var(--accent-neon);
-        }
+    .hero-stats {
+      display: flex; gap: 2.5rem; justify-content: center;
+      margin-top: 3.5rem; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-size: 2rem; font-weight: 800; color: var(--white);
+      background: linear-gradient(135deg, var(--purple-400), var(--cyan-400));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-stat-label { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-top: 0.2rem; }
 
-        .hero-text h1 { font-size: 3rem; color: var(--text-white); margin-bottom: 10px; }
-        .hero-text h1 span { color: var(--accent-neon); }
+    /* ── SECTIONS ── */
+    section { padding: 5rem 5%; }
+    .section-label {
+      text-align: center; font-size: 0.8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--purple-600); margin-bottom: 0.75rem;
+    }
+    .section-title {
+      text-align: center; font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-weight: 800; color: var(--gray-900); letter-spacing: -0.02em;
+      margin-bottom: 0.75rem; line-height: 1.2;
+    }
+    .section-sub {
+      text-align: center; font-size: 1rem; color: var(--gray-600);
+      max-width: 580px; margin: 0 auto 3rem;
+    }
 
-        /* Top Bar Profile */
-        .top-bar {
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 0 40px;
-            position: absolute;
-            width: calc(100% - var(--sidebar-width));
-            z-index: 10;
-        }
+    /* ── WHAT IS ── */
+    #about { background: var(--white); }
+    .about-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+      gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+    }
+    .about-card {
+      background: var(--purple-100); border-radius: var(--radius);
+      padding: 2rem; transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(124,58,237,0.1);
+    }
+    .about-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .about-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem; font-size: 1.3rem;
+    }
+    .about-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem; }
+    .about-card p { font-size: 0.9rem; color: var(--gray-600); line-height: 1.6; }
 
-        .user-profile { display: flex; align-items: center; gap: 12px; color: white; cursor: pointer; }
-        .profile-img {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--accent-neon);
-            display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--accent-neon);
-        }
+    /* ── FEATURES ── */
+    #features { background: var(--gray-50); }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+      gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 2rem; box-shadow: var(--shadow);
+      border: 1px solid rgba(124,58,237,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex; gap: 1.25rem; align-items: flex-start;
+    }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .feature-num {
+      width: 40px; height: 40px; min-width: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      color: var(--white); font-weight: 800; font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feature-card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.4rem; }
+    .feature-card p { font-size: 0.88rem; color: var(--gray-600); line-height: 1.6; }
 
-        /* Dashboard Content */
-        .dashboard-grid {
-            padding: 40px;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 25px;
-        }
+    /* ── LIVE DEMO 3D ── */
+    #demo {
+      background: linear-gradient(160deg, #080514 0%, #100a24 50%, #0e0520 100%);
+      color: var(--white);
+      padding-bottom: 4rem;
+    }
+    #demo .section-title { color: var(--white); }
+    #demo .section-sub { color: rgba(255,255,255,0.55); }
 
-        .ai-demo-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            border: 1px solid var(--accent-neon);
-            padding: 20px;
-            overflow: hidden;
-        }
+    .demo3d-shell {
+      max-width: 1060px; margin: 0 auto;
+      border-radius: 20px; overflow: hidden;
+      border: 1px solid rgba(139,92,246,0.25);
+      box-shadow: 0 0 80px rgba(124,58,237,0.15), 0 0 0 1px rgba(139,92,246,0.1);
+      position: relative;
+    }
+    .demo3d-topbar {
+      background: rgba(0,0,0,0.5);
+      padding: 0.7rem 1.25rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      border-bottom: 1px solid rgba(139,92,246,0.15);
+      backdrop-filter: blur(8px);
+    }
+    .demo3d-dot { width: 11px; height: 11px; border-radius: 50%; }
+    .demo3d-dot.r { background: #ff5f57; }
+    .demo3d-dot.y { background: #ffbd2e; }
+    .demo3d-dot.g { background: #28ca41; }
+    .demo3d-titlebar { margin-left: 0.75rem; font-size: 0.78rem; color: rgba(255,255,255,0.45); font-family: monospace; }
+    .demo3d-pill {
+      margin-left: auto; background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.35); color: #10b981;
+      font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.7rem; border-radius: 999px;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: liveblink 1s ease-in-out infinite; }
+    @keyframes liveblink { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-        .demo-gif-container {
-            width: 100%;
-            height: 350px;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 15px;
-            border: 1px solid #233554;
-        }
+    .demo3d-body {
+      display: grid; grid-template-columns: 1fr 300px;
+      min-height: 520px;
+    }
+    @media(max-width:780px){ .demo3d-body { grid-template-columns: 1fr; } }
 
-        .demo-gif-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
-        }
+    #three-canvas-wrap {
+      position: relative; background: transparent; cursor: grab;
+    }
+    #three-canvas-wrap:active { cursor: grabbing; }
+    #three-canvas { display: block; width: 100%; height: 100%; min-height: 460px; }
 
-        .stat-group { display: grid; gap: 20px; }
-        .stat-card {
-            background: var(--bg-card);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #233554;
-        }
+    .demo3d-hint {
+      position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.5); border: 1px solid rgba(139,92,246,0.25);
+      color: rgba(255,255,255,0.45); font-size: 0.72rem; padding: 0.3rem 0.85rem;
+      border-radius: 999px; pointer-events: none; white-space: nowrap;
+    }
 
-        .value { font-size: 2rem; color: var(--accent-neon); font-weight: bold; }
-        
-        .badge {
-            background: rgba(0, 255, 255, 0.1);
-            color: var(--accent-neon);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-        }
+    .demo3d-sidebar {
+      border-left: 1px solid rgba(139,92,246,0.15);
+      background: rgba(0,0,0,0.3);
+      display: flex; flex-direction: column;
+    }
+    .sidebar-section {
+      padding: 1.2rem 1.25rem;
+      border-bottom: 1px solid rgba(139,92,246,0.1);
+    }
+    .sidebar-section:last-child { border-bottom: none; flex: 1; }
+    .sidebar-label {
+      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--purple-300); margin-bottom: 0.9rem;
+    }
 
-    </style>
+    .node-legend { display: flex; flex-direction: column; gap: 0.55rem; }
+    .legend-row { display: flex; align-items: center; gap: 0.65rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-dot.hub  { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+    .legend-dot.live { background: #10b981; box-shadow: 0 0 8px #10b981; animation: liveblink 1.2s infinite; }
+    .legend-dot.proc { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; animation: liveblink 0.8s infinite; }
+    .legend-dot.idle2{ background: #4b5563; }
+    .legend-text { font-size: 0.8rem; color: rgba(255,255,255,0.7); }
+    .legend-count { margin-left: auto; font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.4); }
+
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+    .kpi-box {
+      background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 8px; padding: 0.7rem 0.75rem; text-align: center;
+    }
+    .kpi-val { font-size: 1.1rem; font-weight: 800; color: var(--purple-300); display: block; }
+    .kpi-lbl { font-size: 0.68rem; color: rgba(255,255,255,0.45); margin-top: 0.15rem; }
+
+    .slog { display: flex; flex-direction: column; gap: 0; overflow: hidden; }
+    .slog-entry {
+      font-family: monospace; font-size: 0.7rem;
+      color: rgba(255,255,255,0.45); padding: 0.28rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; gap: 0.5rem; align-items: flex-start;
+    }
+    .slog-time { color: #22d3ee; flex-shrink: 0; }
+    .slog-ok { color: #10b981; flex-shrink: 0; }
+    .slog-warn { color: #f59e0b; flex-shrink: 0; }
+
+    .demo3d-controls {
+      display: flex; gap: 0.5rem; margin-top: 0.9rem; flex-wrap: wrap;
+    }
+    .ctrl-btn {
+      flex: 1; padding: 0.45rem 0.5rem; border-radius: 7px; font-size: 0.75rem;
+      font-weight: 600; cursor: pointer; border: 1px solid rgba(139,92,246,0.3);
+      background: rgba(139,92,246,0.1); color: rgba(255,255,255,0.7);
+      transition: all 0.2s; min-width: 70px;
+    }
+    .ctrl-btn:hover { background: rgba(139,92,246,0.25); color: #fff; border-color: var(--purple-400); }
+    .ctrl-btn.active { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
+
+    /* ── MEP TRADE TOGGLES ── */
+    .trade-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+    .trade-btn {
+      border-radius: 6px; padding: 0.38rem 0.5rem; font-size: 0.7rem; font-weight: 700;
+      cursor: pointer; border: 1.5px solid; transition: all 0.2s; opacity: 0.45;
+      display: flex; align-items: center; gap: 0.35rem;
+    }
+    .trade-btn.active { opacity: 1; }
+    .trade-btn .tbdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .trade-btn.hvac    { color:#00e5ff; border-color:rgba(0,229,255,0.35); background:rgba(0,229,255,0.06); }
+    .trade-btn.hvac.active { background:rgba(0,229,255,0.16); }
+    .trade-btn.plumbing{ color:#e040fb; border-color:rgba(224,64,251,0.35); background:rgba(224,64,251,0.06); }
+    .trade-btn.plumbing.active{ background:rgba(224,64,251,0.16); }
+    .trade-btn.fire    { color:#f44336; border-color:rgba(244,67,54,0.35); background:rgba(244,67,54,0.06); }
+    .trade-btn.fire.active { background:rgba(244,67,54,0.16); }
+    .trade-btn.electrical{ color:#ff6e40; border-color:rgba(255,110,64,0.35); background:rgba(255,110,64,0.06); }
+    .trade-btn.electrical.active{ background:rgba(255,110,64,0.16); }
+    .trade-btn.drain   { color:#66bb6a; border-color:rgba(102,187,106,0.35); background:rgba(102,187,106,0.06); }
+    .trade-btn.drain.active{ background:rgba(102,187,106,0.16); }
+    .trade-btn.structure{ color:#90a4ae; border-color:rgba(144,164,174,0.35); background:rgba(144,164,174,0.06); }
+    .trade-btn.structure.active{ background:rgba(144,164,174,0.16); }
+
+    .clash-box {
+      background: rgba(244,67,54,0.08); border: 1px solid rgba(244,67,54,0.2);
+      border-radius: 8px; padding: 0.65rem 0.85rem;
+      display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem;
+    }
+    .clash-num { font-size: 1.5rem; font-weight: 900; color: #f44336; line-height: 1; min-width: 28px; }
+    .clash-info small { font-size: 0.67rem; color: rgba(255,255,255,0.35); display: block; }
+    .clash-status { font-size: 0.73rem; font-weight: 600; color: #f59e0b; }
+    .clash-btn {
+      width:100%; padding:0.42rem; border-radius:6px; font-size:0.72rem; font-weight:700;
+      cursor:pointer; border:1px solid rgba(244,67,54,0.35); background:rgba(244,67,54,0.1);
+      color:#ef9a9a; transition:all 0.2s;
+    }
+    .clash-btn:hover { background:rgba(244,67,54,0.22); color:#fff; }
+
+    /* ── STATS ── */
+    #stats { background: var(--white); }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+      gap: 2rem; max-width: 900px; margin: 0 auto;
+    }
+    .stat-card {
+      text-align: center; padding: 2.5rem 1.5rem;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--purple-100), #fff);
+      border: 1px solid rgba(124,58,237,0.12);
+    }
+    .stat-num {
+      font-size: 3rem; font-weight: 900; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0.5rem 0 0.4rem; }
+    .stat-desc { font-size: 0.85rem; color: var(--gray-600); }
+
+    /* ── INDUSTRIES ── */
+    #industries { background: var(--gray-50); }
+    .industry-tabs {
+      display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .ind-tab {
+      padding: 0.55rem 1.2rem; border-radius: 999px; border: 1.5px solid rgba(124,58,237,0.25);
+      background: transparent; color: var(--gray-700); font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .ind-tab.active, .ind-tab:hover {
+      background: var(--purple-600); color: var(--white); border-color: var(--purple-600);
+    }
+    .industry-content {
+      max-width: 800px; margin: 0 auto;
+      background: var(--white); border-radius: var(--radius);
+      padding: 2.5rem; box-shadow: var(--shadow);
+      border: 1px solid rgba(124,58,237,0.1);
+      display: none;
+    }
+    .industry-content.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .ind-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .industry-content h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.75rem; color: var(--gray-900); }
+    .industry-content p { color: var(--gray-600); font-size: 0.95rem; line-height: 1.7; }
+    .ind-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem; }
+    .ind-tag {
+      background: var(--purple-100); color: var(--purple-600);
+      padding: 0.3rem 0.85rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600;
+    }
+
+    /* ── ARCHITECTURE ── */
+    #architecture { background: var(--white); }
+    .arch-flow {
+      display: flex; flex-direction: column; gap: 0;
+      max-width: 640px; margin: 0 auto;
+    }
+    .arch-step {
+      display: flex; align-items: stretch; gap: 1.5rem;
+    }
+    .arch-spine {
+      display: flex; flex-direction: column; align-items: center; min-width: 48px;
+    }
+    .arch-circle {
+      width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      color: var(--white); font-weight: 800; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 4px rgba(124,58,237,0.15);
+    }
+    .arch-line { flex: 1; width: 2px; background: rgba(124,58,237,0.2); margin: 0 auto; }
+    .arch-body {
+      padding: 1rem 0 2rem; flex: 1;
+    }
+    .arch-body h4 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.3rem; }
+    .arch-body p { font-size: 0.88rem; color: var(--gray-600); }
+
+    /* ── WHY CHOOSE ── */
+    #why { background: var(--gray-50); }
+    .why-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+      gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+    }
+    .why-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 2rem; border: 1px solid rgba(124,58,237,0.1);
+      border-left: 4px solid var(--purple-500);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .why-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .why-card h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem; }
+    .why-card p { font-size: 0.88rem; color: var(--gray-600); line-height: 1.6; }
+
+    /* ── CASE STUDY ── */
+    #case-study {
+      background: linear-gradient(135deg, var(--purple-600) 0%, #4c1d95 100%);
+      color: var(--white);
+    }
+    #case-study .section-title { color: var(--white); }
+    #case-study .section-sub { color: rgba(255,255,255,0.7); }
+    .case-inner {
+      max-width: 900px; margin: 0 auto;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px; padding: 3rem;
+    }
+    .case-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+    }
+    @media(max-width:640px){ .case-cols { grid-template-columns: 1fr; } }
+    .case-col h3 {
+      font-size: 1rem; font-weight: 700; color: rgba(255,255,255,0.6);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;
+    }
+    .case-col p { font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.7; }
+    .result-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .result-item:last-child { border-bottom: none; }
+    .result-pct {
+      font-size: 1.5rem; font-weight: 900; color: var(--white); min-width: 70px;
+    }
+    .result-text { font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+
+    /* ── CTA ── */
+    #cta { background: var(--dark-900); text-align: center; }
+    #cta .section-title { color: var(--white); }
+    #cta .section-sub { color: rgba(255,255,255,0.6); }
+    .cta-form {
+      display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;
+      max-width: 500px; margin: 0 auto;
+    }
+    .cta-input {
+      flex: 1; min-width: 220px; padding: 0.85rem 1.25rem;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(167,139,250,0.3);
+      border-radius: 10px; color: var(--white); font-size: 0.95rem;
+      outline: none;
+    }
+    .cta-input::placeholder { color: rgba(255,255,255,0.35); }
+    .cta-input:focus { border-color: var(--purple-400); }
+    .cta-note { font-size: 0.8rem; color: rgba(255,255,255,0.35); margin-top: 1rem; }
+
+    /* ── PRICING ── */
+    #pricing { background: var(--gray-50); }
+
+    .billing-toggle {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.85rem; margin-bottom: 3rem;
+    }
+    .billing-label {
+      font-size: 0.9rem; font-weight: 600; color: var(--gray-600); cursor: pointer;
+      transition: color 0.2s;
+    }
+    .billing-label.active { color: var(--purple-600); }
+    .toggle-track {
+      width: 48px; height: 26px; background: var(--purple-600); border-radius: 999px;
+      position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .toggle-thumb {
+      width: 20px; height: 20px; background: #fff; border-radius: 50%;
+      position: absolute; top: 3px; left: 4px;
+      transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+    }
+    .toggle-thumb.annual { transform: translateX(22px); }
+    .badge-save {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem;
+      border-radius: 999px; letter-spacing: 0.04em;
+    }
+
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.5rem; max-width: 1060px; margin: 0 auto; align-items: start;
+    }
+    .pricing-card {
+      background: var(--white); border-radius: 18px;
+      border: 1.5px solid rgba(124,58,237,0.12);
+      padding: 2.2rem 2rem; position: relative;
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .pricing-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+    .pricing-card.popular {
+      border-color: var(--purple-600);
+      background: linear-gradient(160deg, #faf5ff 0%, #fff 60%);
+      box-shadow: 0 8px 40px rgba(124,58,237,0.18);
+      transform: scale(1.03);
+    }
+    .pricing-card.popular:hover { transform: scale(1.03) translateY(-5px); }
+    .popular-badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-400));
+      color: #fff; font-size: 0.72rem; font-weight: 700; padding: 0.28rem 1rem;
+      border-radius: 999px; letter-spacing: 0.06em; text-transform: uppercase;
+      white-space: nowrap; box-shadow: 0 2px 12px rgba(124,58,237,0.35);
+    }
+    .plan-name {
+      font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--purple-600); margin-bottom: 0.5rem;
+    }
+    .plan-desc { font-size: 0.88rem; color: var(--gray-600); margin-bottom: 1.5rem; line-height: 1.5; }
+    .plan-price {
+      display: flex; align-items: flex-end; gap: 0.25rem; margin-bottom: 0.4rem;
+    }
+    .price-currency { font-size: 1.4rem; font-weight: 700; color: var(--gray-700); line-height: 1.6; }
+    .price-amount {
+      font-size: 3.2rem; font-weight: 900; color: var(--gray-900);
+      letter-spacing: -0.04em; line-height: 1;
+    }
+    .pricing-card.popular .price-amount { color: var(--purple-600); }
+    .price-period { font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.25rem; padding-bottom: 0.2rem; }
+    .price-billed { font-size: 0.76rem; color: var(--gray-600); margin-bottom: 1.75rem; min-height: 1.1em; }
+    .price-billed .saving { color: #059669; font-weight: 700; }
+
+    .plan-divider {
+      height: 1px; background: rgba(124,58,237,0.1); margin: 0 0 1.5rem;
+    }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 2rem; }
+    .plan-features li {
+      display: flex; align-items: flex-start; gap: 0.65rem;
+      font-size: 0.88rem; color: var(--gray-700); line-height: 1.45;
+    }
+    .feat-icon { flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; margin-top: 1px; }
+    .feat-icon.yes { background: rgba(124,58,237,0.12); color: var(--purple-600); }
+    .feat-icon.no  { background: rgba(107,114,128,0.1); color: #9ca3af; }
+    .plan-features li.dimmed { color: #9ca3af; }
+
+    .plan-cta {
+      display: block; width: 100%; padding: 0.88rem; border-radius: 10px;
+      font-size: 0.95rem; font-weight: 700; text-align: center; cursor: pointer;
+      border: none; transition: all 0.2s; text-decoration: none;
+    }
+    .plan-cta.outline {
+      background: transparent; color: var(--purple-600);
+      border: 2px solid var(--purple-600);
+    }
+    .plan-cta.outline:hover { background: var(--purple-100); }
+    .plan-cta.filled {
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+      color: #fff; box-shadow: 0 4px 18px rgba(124,58,237,0.38);
+    }
+    .plan-cta.filled:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(124,58,237,0.48); }
+    .plan-cta.dark {
+      background: var(--gray-900); color: #fff;
+    }
+    .plan-cta.dark:hover { background: var(--gray-700); }
+
+    .pricing-footer {
+      text-align: center; margin-top: 2.5rem;
+      font-size: 0.85rem; color: var(--gray-600);
+    }
+    .pricing-footer a { color: var(--purple-600); text-decoration: none; font-weight: 600; }
+    .pricing-footer a:hover { text-decoration: underline; }
+    .pricing-guarantee {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      margin-top: 1rem; font-size: 0.82rem; color: var(--gray-600);
+    }
+    .pricing-guarantee span { font-size: 1.1rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--dark-900);
+      border-top: 1px solid rgba(167,139,250,0.1);
+      padding: 2rem 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-size: 1rem; font-weight: 700; color: var(--white); }
+    .footer-logo span { color: var(--purple-400); }
+    footer p { font-size: 0.8rem; color: rgba(255,255,255,0.3); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { font-size: 0.82rem; color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-links a:hover { color: var(--purple-300); }
+
+    /* Responsive */
+    @media(max-width:768px){
+      .nav-links { display: none; }
+      section { padding: 3.5rem 5%; }
+    }
+
+    /* ══ AUTH MODAL ══════════════════════════════════════════════════════════ */
+    .auth-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(10,5,25,0.88);
+      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .auth-overlay.open { opacity: 1; pointer-events: all; }
+    .auth-card {
+      background: linear-gradient(160deg, #1c1035 0%, #110c26 100%);
+      border: 1px solid rgba(139,92,246,0.28);
+      border-radius: 20px; padding: 2.5rem 2.25rem;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 32px 90px rgba(0,0,0,0.65), 0 0 0 1px rgba(139,92,246,0.08);
+      position: relative; animation: authSlideIn 0.28s ease;
+    }
+    @keyframes authSlideIn { from{transform:translateY(18px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .auth-close {
+      position: absolute; top: 1.1rem; right: 1.3rem;
+      background: none; border: none; color: rgba(255,255,255,0.35);
+      font-size: 1.5rem; cursor: pointer; line-height: 1;
+      transition: color 0.2s; padding: 0;
+    }
+    .auth-close:hover { color: var(--white); }
+    .auth-logo {
+      text-align: center; margin-bottom: 1.6rem;
+      font-size: 1.3rem; font-weight: 800; color: var(--white);
+      letter-spacing: -0.02em;
+    }
+    .auth-logo span { color: var(--purple-400); }
+    .auth-tabs {
+      display: flex; background: rgba(255,255,255,0.06);
+      border-radius: 11px; padding: 4px; margin-bottom: 1.6rem;
+    }
+    .auth-tab {
+      flex: 1; padding: 0.55rem; text-align: center;
+      font-size: 0.88rem; font-weight: 600;
+      color: rgba(255,255,255,0.42); cursor: pointer;
+      border-radius: 8px; transition: all 0.2s;
+      border: none; background: none;
+    }
+    .auth-tab.active {
+      background: var(--purple-600); color: var(--white);
+      box-shadow: 0 2px 14px rgba(124,58,237,0.45);
+    }
+    .auth-form { display: flex; flex-direction: column; gap: 0.9rem; }
+    .auth-field label {
+      display: block; font-size: 0.76rem; font-weight: 700;
+      color: rgba(255,255,255,0.52); margin-bottom: 0.35rem;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .auth-field input {
+      width: 100%; padding: 0.72rem 1rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(139,92,246,0.2);
+      border-radius: 9px; color: var(--white);
+      font-size: 0.94rem; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      font-family: inherit;
+    }
+    .auth-field input:focus {
+      border-color: var(--purple-400);
+      background: rgba(139,92,246,0.1);
+    }
+    .auth-field input::placeholder { color: rgba(255,255,255,0.22); }
+    .auth-btn-main {
+      width: 100%; padding: 0.82rem;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+      border: none; border-radius: 9px;
+      color: var(--white); font-size: 0.97rem; font-weight: 700;
+      cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 22px rgba(124,58,237,0.42);
+      margin-top: 0.2rem; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .auth-btn-main:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .auth-btn-main:disabled { opacity: 0.48; cursor: not-allowed; transform: none; }
+    .auth-divider {
+      display: flex; align-items: center; gap: 0.75rem;
+      color: rgba(255,255,255,0.2); font-size: 0.78rem;
+    }
+    .auth-divider::before,.auth-divider::after {
+      content:''; flex:1; height:1px; background:rgba(255,255,255,0.09);
+    }
+    .auth-btn-google {
+      width: 100%; padding: 0.72rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 9px; color: var(--white);
+      font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center;
+      justify-content: center; gap: 0.65rem;
+      transition: background 0.2s, border-color 0.2s;
+      font-family: inherit;
+    }
+    .auth-btn-google:hover { background:rgba(255,255,255,0.13); border-color:rgba(255,255,255,0.26); }
+    .auth-btn-google svg { width:18px; height:18px; flex-shrink:0; }
+    .auth-error {
+      background: rgba(239,68,68,0.13);
+      border: 1px solid rgba(239,68,68,0.32);
+      color: #fca5a5; padding: 0.6rem 0.85rem;
+      border-radius: 8px; font-size: 0.84rem;
+      display: none; line-height: 1.45;
+    }
+    .auth-error.show { display: block; }
+    .auth-success {
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: #86efac; padding: 0.6rem 0.85rem;
+      border-radius: 8px; font-size: 0.84rem;
+      display: none; text-align: center;
+    }
+    .auth-success.show { display: block; }
+    .auth-switch {
+      text-align: center; margin-top: 1.2rem;
+      font-size: 0.84rem; color: rgba(255,255,255,0.38);
+    }
+    .auth-switch a { color:var(--purple-400); cursor:pointer; font-weight:600; }
+    .auth-switch a:hover { color:var(--purple-300); }
+    .auth-forgot { text-align:right; margin-top:-0.3rem; }
+    .auth-forgot a {
+      font-size:0.78rem; color:rgba(167,139,250,0.65);
+      cursor:pointer; text-decoration:none;
+    }
+    .auth-forgot a:hover { color:var(--purple-300); }
+
+    /* ══ NAV USER STATE ═══════════════════════════════════════════════════════ */
+    .nav-auth-zone { display:flex; align-items:center; gap:0.65rem; }
+    .nav-login-btn {
+      background: transparent; color: rgba(255,255,255,0.75);
+      border: 1.5px solid rgba(167,139,250,0.38);
+      padding: 0.44rem 1.05rem; border-radius: 8px;
+      font-size: 0.87rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .nav-login-btn:hover {
+      border-color: var(--purple-400); color: var(--white);
+      background: rgba(139,92,246,0.12);
+    }
+    .nav-user { display:none; align-items:center; gap:0.5rem; position:relative; }
+    .nav-user.visible { display:flex; }
+    .nav-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-600), var(--cyan-400));
+      color: var(--white); font-size: 0.82rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid rgba(167,139,250,0.35);
+      transition: border-color 0.2s; overflow: hidden; user-select: none;
+    }
+    .nav-avatar:hover { border-color: var(--purple-300); }
+    .nav-user-name {
+      font-size: 0.87rem; font-weight: 600; color: rgba(255,255,255,0.82);
+      max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .nav-dropdown {
+      position: absolute; top: calc(100% + 12px); right: 0;
+      background: #1c1035; border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 13px; padding: 0.5rem; min-width: 190px;
+      box-shadow: 0 14px 44px rgba(0,0,0,0.55);
+      opacity: 0; pointer-events: none; transform: translateY(-8px);
+      transition: opacity 0.2s, transform 0.2s; z-index: 200;
+    }
+    .nav-dropdown.open { opacity:1; pointer-events:all; transform:translateY(0); }
+    .nav-dd-email {
+      padding: 0.55rem 0.9rem; font-size: 0.76rem;
+      color: rgba(255,255,255,0.32);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 0.35rem;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .nav-dd-item {
+      display: block; width: 100%; padding: 0.62rem 0.9rem;
+      text-align: left; background: none; border: none;
+      color: rgba(255,255,255,0.72); font-size: 0.87rem; font-weight: 500;
+      cursor: pointer; border-radius: 8px;
+      transition: background 0.15s, color 0.15s; font-family: inherit;
+    }
+    .nav-dd-item:hover { background:rgba(139,92,246,0.16); color:var(--white); }
+    .nav-dd-item.danger { color: rgba(252,165,165,0.75); }
+    .nav-dd-item.danger:hover { background:rgba(239,68,68,0.13); color:#fca5a5; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block; width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.28);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.65s linear infinite; vertical-align: middle;
+    }
+  </style>
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-logo">MEPNOVA AI</div>
-        <nav class="nav-menu">
-            <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i> <span>Home</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-cube"></i> <span>BIM Models</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-bolt"></i> <span>AI Resolver</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i> <span>Pricing</span></a>
-            <a href="#" class="nav-item"><i class="fa-solid fa-envelope"></i> <span>Contact</span></a>
-        </nav>
-        <div class="sidebar-footer">
-            <a href="#" class="nav-item" style="color: #ff5f56;"><i class="fa-solid fa-power-off"></i> <span>Logout</span></a>
-        </div>
-    </aside>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Flux<span>Coord</span> AI</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#features">Features</a>
+    <a href="#demo">Demo</a>
+    <a href="#industries">Industries</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-auth-zone">
+    <a class="nav-cta" href="#cta" style="text-decoration:none">Request Demo</a>
+    <button class="nav-login-btn" id="nav-login-btn" onclick="openAuth('signin')">Log In</button>
+    <div class="nav-user" id="nav-user">
+      <div class="nav-avatar" id="nav-avatar" onclick="toggleDropdown(event)">?</div>
+      <span class="nav-user-name" id="nav-user-name"></span>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <div class="nav-dd-email" id="nav-dd-email">loading…</div>
+        <button class="nav-dd-item" onclick="closeDropdown();openAuth('profile')">⚙️ &nbsp;Account Settings</button>
+        <button class="nav-dd-item danger" onclick="signOutUser()">↩ &nbsp;Sign Out</button>
+      </div>
+    </div>
+  </div>
+</nav>
 
-    <div class="main-content">
-        <header class="top-bar">
-            <div class="user-profile">
-                <span style="font-size: 0.9rem; font-weight: bold;">Er. Neupane Bibek</span>
-                <div class="profile-img">
-                    <i class="fa-solid fa-user-tie" style="color: #0A192F;"></i>
-                </div>
-            </div>
-        </header>
+<!-- ══ AUTH MODAL ═══════════════════════════════════════════════════════════ -->
+<div class="auth-overlay" id="auth-overlay" onclick="handleOverlayClick(event)">
+  <div class="auth-card">
+    <button class="auth-close" onclick="closeAuth()" aria-label="Close">&#x2715;</button>
+    <div class="auth-logo">Flux<span>Coord</span> AI</div>
 
-        <section class="hero-banner">
-            <div class="hero-text">
-                <span class="badge">AI-Powered Engineering</span>
-                <h1>Solve BIM Clashes with <span>Precision</span></h1>
-                <p style="max-width: 600px; color: #ccd6f6;">MEPNOVA AI automates the coordination of Mechanical, Electrical, and Plumbing services using generative algorithms.</p>
-            </div>
-        </section>
-
-        <main class="dashboard-grid">
-            
-            <div class="ai-demo-card">
-                <h3 style="color: white;"><i class="fa-solid fa-microchip" style="color: var(--accent-neon);"></i> Live AI Solver Simulation</h3>
-                <p style="font-size: 0.85rem; margin-top: 5px;">Analyzing ductwork vs structural beams in Project: Terminal 3...</p>
-                <div class="demo-gif-container">
-                    <img src="http://googleusercontent.com/image_collection/image_retrieval/4688270323657160780_0" alt="BIM MEP AI Resolution Demo">
-                </div>
-                <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #27c93f; font-weight: bold;"><i class="fa-solid fa-circle-check"></i> 14 Clashes Resolved Automatically</span>
-                    <button style="background: var(--accent-neon); color: #0A192F; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">Export to Revit</button>
-                </div>
-            </div>
-
-            <div class="stat-group">
-                <div class="stat-card">
-                    <h3 style="font-size: 0.9rem;">Global Coordination Score</h3>
-                    <div class="value">98.2%</div>
-                    <div style="width: 100%; height: 6px; background: #233554; border-radius: 3px; margin-top: 10px;">
-                        <div style="width: 98%; height: 100%; background: var(--accent-neon); border-radius: 3px;"></div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <h3 style="font-size: 0.9rem;">International Payments</h3>
-                    <div style="display: flex; gap: 10px; margin-top: 10px; font-size: 1.2rem; color: var(--text-white);">
-                        <i class="fa-brands fa-cc-visa"></i>
-                        <i class="fa-brands fa-cc-mastercard"></i>
-                        <i class="fa-brands fa-cc-stripe"></i>
-                        <i class="fa-brands fa-cc-apple-pay"></i>
-                    </div>
-                    <p style="font-size: 0.7rem; margin-top: 10px;">Secure multi-currency processing enabled.</p>
-                </div>
-            </div>
-
-        </main>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-signin" onclick="switchTab('signin')">Sign In</button>
+      <button class="auth-tab"        id="tab-signup" onclick="switchTab('signup')">Create Account</button>
     </div>
 
+    <div id="auth-error"   class="auth-error"></div>
+    <div id="auth-success" class="auth-success"></div>
+
+    <!-- ── SIGN IN FORM ── -->
+    <form class="auth-form" id="form-signin" onsubmit="handleSignIn(event)">
+      <div class="auth-field">
+        <label for="si-email">Email</label>
+        <input type="email" id="si-email" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="auth-field">
+        <label for="si-password">Password</label>
+        <input type="password" id="si-password" placeholder="Your password" autocomplete="current-password" required />
+      </div>
+      <div class="auth-forgot"><a onclick="handleForgotPassword()">Forgot password?</a></div>
+      <button type="submit" class="auth-btn-main" id="btn-signin">Sign In</button>
+      <div class="auth-divider">or</div>
+      <button type="button" class="auth-btn-google" onclick="handleGoogleAuth()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </form>
+
+    <!-- ── SIGN UP FORM ── -->
+    <form class="auth-form" id="form-signup" style="display:none" onsubmit="handleSignUp(event)">
+      <div class="auth-field">
+        <label for="su-name">Full Name</label>
+        <input type="text" id="su-name" placeholder="Your full name" autocomplete="name" required />
+      </div>
+      <div class="auth-field">
+        <label for="su-email">Email</label>
+        <input type="email" id="su-email" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="auth-field">
+        <label for="su-password">Password</label>
+        <input type="password" id="su-password" placeholder="At least 8 characters" minlength="8" autocomplete="new-password" required />
+      </div>
+      <div class="auth-field">
+        <label for="su-confirm">Confirm Password</label>
+        <input type="password" id="su-confirm" placeholder="Repeat your password" autocomplete="new-password" required />
+      </div>
+      <button type="submit" class="auth-btn-main" id="btn-signup">Create Account</button>
+      <div class="auth-divider">or</div>
+      <button type="button" class="auth-btn-google" onclick="handleGoogleAuth()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </form>
+
+    <div class="auth-switch" id="auth-switch-text">
+      Don't have an account? <a onclick="switchTab('signup')">Sign up free</a>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-nodes">
+    <div class="node"></div>
+    <div class="node"></div>
+    <div class="node"></div>
+  </div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🚀 Advanced AI Coordination Platform</div>
+    <h1 class="hero-title">
+      Intelligent Coordination<br/>
+      for <span class="highlight">Dynamic Systems</span>
+    </h1>
+    <p class="hero-sub">
+      FluxCoord AI is a real-time coordination and optimization engine designed for complex, dynamic environments — powered by distributed machine learning.
+    </p>
+    <div class="hero-buttons">
+      <a class="btn-primary" href="#demo">See Live Demo</a>
+      <a class="btn-secondary" href="#about">Learn More</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-count="40" data-suffix="%">40%</div>
+        <div class="hero-stat-label">Cost Reduction</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">24/7</div>
+        <div class="hero-stat-label">Autonomous Ops</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-count="45" data-suffix="%">45%</div>
+        <div class="hero-stat-label">Faster Response</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-count="99.7" data-suffix="%">99.7%</div>
+        <div class="hero-stat-label">Accuracy Rate</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <p class="section-label">What is FluxCoord AI</p>
+  <h2 class="section-title">Built for Complexity. Designed for Scale.</h2>
+  <p class="section-sub">Four foundational pillars power the FluxCoord AI engine.</p>
+  <div class="about-grid">
+    <div class="about-card">
+      <div class="about-icon">🧠</div>
+      <h3>Advanced AI System</h3>
+      <p>Real-time coordination and optimization engine designed for complex, dynamic environments that demand instant intelligent response.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-icon">⚙️</div>
+      <h3>Machine Learning Core</h3>
+      <p>Leverages predictive models to manage workflows and optimize resource allocation — learning continuously from every interaction.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-icon">🔗</div>
+      <h3>Distributed Intelligence</h3>
+      <p>Enables intelligent decision-making across multiple interconnected systems with no single point of failure or bottleneck.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-icon">📈</div>
+      <h3>Adaptive Framework</h3>
+      <p>Focuses on adaptability, scalability, and operational efficiency — growing with your business without proportional cost increases.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <p class="section-label">Key Features</p>
+  <h2 class="section-title">Five Engines of Optimization</h2>
+  <p class="section-sub">Every feature is purpose-built to eliminate inefficiency and maximize throughput across your organization.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-num">1</div>
+      <div>
+        <h3>Real-Time Monitoring</h3>
+        <p>Continuous system analysis with instant status updates and anomaly detection — nothing slips through the cracks.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">2</div>
+      <div>
+        <h3>Intelligent Scheduling</h3>
+        <p>Optimizes resource allocation and timing based on dynamic priorities, adapting in real time as conditions change.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">3</div>
+      <div>
+        <h3>Adaptive Learning</h3>
+        <p>Improves decision-making through historical data analysis and pattern recognition — getting smarter every day.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">4</div>
+      <div>
+        <h3>Multi-Agent Coordination</h3>
+        <p>Seamlessly manages multiple system components working in parallel, ensuring synchronization across the entire pipeline.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-num">5</div>
+      <div>
+        <h3>Predictive Analytics</h3>
+        <p>Anticipates bottlenecks and identifies optimization opportunities before they impact operations — proactive, not reactive.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEMO 3D -->
+<section id="demo">
+  <p class="section-label" style="color:var(--purple-300)">Interactive 3D Demo</p>
+  <h2 class="section-title">Watch FluxCoord Coordinate in 3D</h2>
+  <p class="section-sub">A real-time 3D visualization of FluxCoord AI's multi-agent coordination engine. Drag to rotate.</p>
+
+  <div class="demo3d-shell">
+    <!-- top bar -->
+    <div class="demo3d-topbar">
+      <div class="demo3d-dot r"></div>
+      <div class="demo3d-dot y"></div>
+      <div class="demo3d-dot g"></div>
+      <span class="demo3d-titlebar">FluxCoord AI — Coordination Engine v3.1 · 3D Network View</span>
+      <div class="demo3d-pill"><div class="live-dot"></div>LIVE</div>
+    </div>
+
+    <!-- body: canvas + sidebar -->
+    <div class="demo3d-body">
+      <!-- 3D canvas -->
+      <div id="three-canvas-wrap">
+        <canvas id="three-canvas"></canvas>
+        <div class="demo3d-hint">🖱 Drag to rotate · Scroll to zoom</div>
+      </div>
+
+      <!-- sidebar -->
+      <div class="demo3d-sidebar">
+
+        <!-- Trade toggles -->
+        <div class="sidebar-section">
+          <div class="sidebar-label">MEP Trades — Toggle Layers</div>
+          <div class="trade-grid">
+            <button class="trade-btn hvac active" onclick="toggleTrade('hvac',this)">
+              <div class="tbdot" style="background:#00e5ff"></div>HVAC
+            </button>
+            <button class="trade-btn plumbing active" onclick="toggleTrade('plumbing',this)">
+              <div class="tbdot" style="background:#e040fb"></div>Plumbing
+            </button>
+            <button class="trade-btn fire active" onclick="toggleTrade('fire',this)">
+              <div class="tbdot" style="background:#f44336"></div>Fire
+            </button>
+            <button class="trade-btn electrical active" onclick="toggleTrade('electrical',this)">
+              <div class="tbdot" style="background:#ff6e40"></div>Electrical
+            </button>
+            <button class="trade-btn drain active" onclick="toggleTrade('drain',this)">
+              <div class="tbdot" style="background:#66bb6a"></div>Drain
+            </button>
+            <button class="trade-btn structure active" onclick="toggleTrade('structure',this)">
+              <div class="tbdot" style="background:#90a4ae"></div>Structure
+            </button>
+          </div>
+        </div>
+
+        <!-- Clash Detection -->
+        <div class="sidebar-section">
+          <div class="sidebar-label">Clash Detection</div>
+          <div class="clash-box">
+            <div class="clash-num" id="clash-count">12</div>
+            <div class="clash-info">
+              <div class="clash-status" id="clash-status">⚠ Review needed</div>
+              <small>Hard clashes detected</small>
+            </div>
+          </div>
+          <button class="clash-btn" onclick="runClashDetection()">🔍 Run Clash Detection</button>
+        </div>
+
+        <!-- BIM metrics -->
+        <div class="sidebar-section">
+          <div class="sidebar-label">BIM Coordination</div>
+          <div class="kpi-grid">
+            <div class="kpi-box"><span class="kpi-val" id="kpi-tasks">3</span><span class="kpi-lbl">Floors</span></div>
+            <div class="kpi-box"><span class="kpi-val" id="kpi-lat">98%</span><span class="kpi-lbl">Coordinated</span></div>
+            <div class="kpi-box"><span class="kpi-val" style="font-size:0.85rem">LOD 350</span><span class="kpi-lbl">Detail Level</span></div>
+            <div class="kpi-box"><span class="kpi-val" id="kpi-nodes">247</span><span class="kpi-lbl">Elements</span></div>
+          </div>
+          <div class="demo3d-controls">
+            <button class="ctrl-btn active" id="btn-rotate" onclick="toggleRotate(this)">⟳ Auto</button>
+            <button class="ctrl-btn" onclick="resetSim()">↺ Reset</button>
+          </div>
+        </div>
+
+        <!-- Event log -->
+        <div class="sidebar-section">
+          <div class="sidebar-label">Coordination Log</div>
+          <div class="slog" id="slog"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <p class="section-label">Business Benefits</p>
+  <h2 class="section-title">Real Results. Measurable Impact.</h2>
+  <p class="section-sub">FluxCoord AI delivers quantifiable ROI from day one of deployment.</p>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num">20–40%</div>
+      <div class="stat-title">Cost Reduction</div>
+      <div class="stat-desc">Decrease in operational costs through optimized workflows and automated resource management.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">24/7</div>
+      <div class="stat-title">Autonomous Operation</div>
+      <div class="stat-desc">Continuous optimization without proportional cost increases or human oversight overhead.</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">45%</div>
+      <div class="stat-title">Faster Response</div>
+      <div class="stat-desc">Reduced downtime through proactive problem detection before failures impact operations.</div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section id="industries">
+  <p class="section-label">Applications</p>
+  <h2 class="section-title">Across Every Industry</h2>
+  <p class="section-sub">FluxCoord AI adapts its coordination intelligence to the specific dynamics of your sector.</p>
+  <div class="industry-tabs">
+    <button class="ind-tab active" onclick="showIndustry('supply')">Supply Chain</button>
+    <button class="ind-tab" onclick="showIndustry('manufacturing')">Manufacturing</button>
+    <button class="ind-tab" onclick="showIndustry('project')">Project Mgmt</button>
+    <button class="ind-tab" onclick="showIndustry('finance')">Financial</button>
+    <button class="ind-tab" onclick="showIndustry('healthcare')">Healthcare</button>
+  </div>
+  <div id="ind-supply" class="industry-content active">
+    <div class="ind-icon">🚚</div>
+    <h3>Supply Chain Management</h3>
+    <p>FluxCoord AI optimizes logistics, inventory coordination, and delivery routing across complex multi-node networks. Real-time demand sensing and predictive replenishment eliminate stockouts and excess inventory simultaneously.</p>
+    <div class="ind-tags">
+      <span class="ind-tag">Inventory Coordination</span>
+      <span class="ind-tag">Route Optimization</span>
+      <span class="ind-tag">Demand Forecasting</span>
+      <span class="ind-tag">Supplier Sync</span>
+    </div>
+  </div>
+  <div id="ind-manufacturing" class="industry-content">
+    <div class="ind-icon">🏭</div>
+    <h3>Manufacturing</h3>
+    <p>Smart production scheduling, quality control automation, and equipment maintenance optimization. FluxCoord predicts machine failures before they occur, scheduling maintenance windows that minimize production downtime.</p>
+    <div class="ind-tags">
+      <span class="ind-tag">Production Scheduling</span>
+      <span class="ind-tag">Predictive Maintenance</span>
+      <span class="ind-tag">Quality Control</span>
+      <span class="ind-tag">OEE Improvement</span>
+    </div>
+  </div>
+  <div id="ind-project" class="industry-content">
+    <div class="ind-icon">📋</div>
+    <h3>Project Management</h3>
+    <p>Intelligent task allocation, timeline optimization, and resource balancing across complex multi-team projects. FluxCoord dynamically adjusts project plans in response to scope changes and resource availability.</p>
+    <div class="ind-tags">
+      <span class="ind-tag">Task Allocation</span>
+      <span class="ind-tag">Timeline Optimization</span>
+      <span class="ind-tag">Resource Balancing</span>
+      <span class="ind-tag">Risk Detection</span>
+    </div>
+  </div>
+  <div id="ind-finance" class="industry-content">
+    <div class="ind-icon">💹</div>
+    <h3>Financial Services</h3>
+    <p>Portfolio optimization, real-time risk management, and algorithmic trading coordination. FluxCoord processes thousands of signals simultaneously to ensure optimal capital allocation and exposure management.</p>
+    <div class="ind-tags">
+      <span class="ind-tag">Portfolio Optimization</span>
+      <span class="ind-tag">Risk Management</span>
+      <span class="ind-tag">Trade Coordination</span>
+      <span class="ind-tag">Compliance Monitoring</span>
+    </div>
+  </div>
+  <div id="ind-healthcare" class="industry-content">
+    <div class="ind-icon">🏥</div>
+    <h3>Healthcare</h3>
+    <p>Patient flow management, resource scheduling, and care coordination optimization. FluxCoord ensures the right staff, equipment, and space are available exactly when needed — reducing wait times and improving outcomes.</p>
+    <div class="ind-tags">
+      <span class="ind-tag">Patient Flow</span>
+      <span class="ind-tag">Staff Scheduling</span>
+      <span class="ind-tag">Equipment Allocation</span>
+      <span class="ind-tag">Care Coordination</span>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <p class="section-label">System Architecture</p>
+  <h2 class="section-title">Five Layers of Intelligence</h2>
+  <p class="section-sub">A closed-loop architecture that continuously learns and improves with every decision.</p>
+  <div class="arch-flow">
+    <div class="arch-step">
+      <div class="arch-spine">
+        <div class="arch-circle">1</div>
+        <div class="arch-line"></div>
+      </div>
+      <div class="arch-body">
+        <h4>Data Input Layer</h4>
+        <p>Collects real-time data from multiple sources — sensors, APIs, databases, and external feeds — into a unified stream.</p>
+      </div>
+    </div>
+    <div class="arch-step">
+      <div class="arch-spine">
+        <div class="arch-circle">2</div>
+        <div class="arch-line"></div>
+      </div>
+      <div class="arch-body">
+        <h4>Processing Engine</h4>
+        <p>Proprietary ML models analyze patterns and generate actionable recommendations at millisecond latency.</p>
+      </div>
+    </div>
+    <div class="arch-step">
+      <div class="arch-spine">
+        <div class="arch-circle">3</div>
+        <div class="arch-line"></div>
+      </div>
+      <div class="arch-body">
+        <h4>Decision Module</h4>
+        <p>Autonomous decision-making with configurable human oversight options — full control over automation thresholds.</p>
+      </div>
+    </div>
+    <div class="arch-step">
+      <div class="arch-spine">
+        <div class="arch-circle">4</div>
+        <div class="arch-line"></div>
+      </div>
+      <div class="arch-body">
+        <h4>Execution Layer</h4>
+        <p>Implements optimized actions across connected systems with full auditability and rollback capability.</p>
+      </div>
+    </div>
+    <div class="arch-step">
+      <div class="arch-spine">
+        <div class="arch-circle">5</div>
+      </div>
+      <div class="arch-body">
+        <h4>Feedback Loop</h4>
+        <p>Continuous learning from outcomes feeds back into the processing engine — the system gets smarter with every cycle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE -->
+<section id="why">
+  <p class="section-label">Why FluxCoord</p>
+  <h2 class="section-title">Built Different. Built to Win.</h2>
+  <p class="section-sub">Five reasons enterprises choose FluxCoord AI over the competition.</p>
+  <div class="why-grid">
+    <div class="why-card">
+      <h3>🔬 Proprietary ML Algorithms</h3>
+      <p>Industry-leading optimization techniques developed by AI experts — not generic models anyone can replicate. A real competitive moat.</p>
+    </div>
+    <div class="why-card">
+      <h3>⏱ 24/7 Autonomous Operation</h3>
+      <p>Minimal human intervention required while maintaining optimal performance around the clock, across all time zones.</p>
+    </div>
+    <div class="why-card">
+      <h3>🔍 Transparent Decision Making</h3>
+      <p>Explainable AI ensures trust, compliance, and auditability — every decision traceable and defensible to regulators and stakeholders.</p>
+    </div>
+    <div class="why-card">
+      <h3>🛡 Enterprise-Grade Security</h3>
+      <p>Robust data protection protocols and system reliability guarantees with SOC 2 compliance and end-to-end encryption.</p>
+    </div>
+    <div class="why-card">
+      <h3>🤝 Dedicated Expert Support</h3>
+      <p>A dedicated team ensures successful implementation and ongoing optimization — from day one through full enterprise rollout.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDY -->
+<section id="case-study">
+  <p class="section-label" style="color:rgba(255,255,255,0.6)">Case Study</p>
+  <h2 class="section-title">E-Commerce Supply Chain Success</h2>
+  <p class="section-sub">How FluxCoord AI transformed a high-volume logistics operation.</p>
+  <div class="case-inner">
+    <div class="case-cols">
+      <div class="case-col">
+        <h3>The Challenge</h3>
+        <p>A leading e-commerce platform managing 50,000+ daily orders across multiple warehouses was facing persistent delivery delays and rapidly rising operational costs. Manual coordination was breaking down at scale.</p>
+        <br/>
+        <h3 style="margin-top:1rem">The Solution</h3>
+        <p>Deployed FluxCoord AI for intelligent inventory management, real-time shipping optimization, and multi-warehouse routing coordination — all within a 6-week integration timeline.</p>
+      </div>
+      <div class="case-col">
+        <h3>Results Delivered</h3>
+        <div class="result-item">
+          <div class="result-pct">35%</div>
+          <div class="result-text">Reduction in average delivery time</div>
+        </div>
+        <div class="result-item">
+          <div class="result-pct">28%</div>
+          <div class="result-text">Decrease in warehouse operational costs</div>
+        </div>
+        <div class="result-item">
+          <div class="result-pct">+22%</div>
+          <div class="result-text">Increase in customer satisfaction score</div>
+        </div>
+        <div class="result-item">
+          <div class="result-pct">99.7%</div>
+          <div class="result-text">Order accuracy rate achieved</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <p class="section-label">Subscription Plans</p>
+  <h2 class="section-title">Simple, Transparent Pricing</h2>
+  <p class="section-sub">Choose the plan that matches your scale. Upgrade or downgrade anytime — no lock-in.</p>
+
+  <!-- Billing toggle -->
+  <div class="billing-toggle">
+    <span class="billing-label active" id="lbl-monthly" onclick="setBilling('monthly')">Monthly</span>
+    <div class="toggle-track" onclick="toggleBilling()" id="billing-track">
+      <div class="toggle-thumb" id="billing-thumb"></div>
+    </div>
+    <span class="billing-label" id="lbl-annual" onclick="setBilling('annual')">Annual</span>
+    <span class="badge-save">Save 20%</span>
+  </div>
+
+  <!-- Plans -->
+  <div class="pricing-grid">
+
+    <!-- Starter -->
+    <div class="pricing-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-desc">Perfect for small teams exploring intelligent coordination for the first time.</div>
+      <div class="plan-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount" id="price-starter">99</span>
+        <span class="price-period">&nbsp;/ mo</span>
+      </div>
+      <div class="price-billed" id="billed-starter">Billed monthly</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><div class="feat-icon yes">✓</div>Up to 5 connected systems</li>
+        <li><div class="feat-icon yes">✓</div>Real-time monitoring dashboard</li>
+        <li><div class="feat-icon yes">✓</div>Intelligent scheduling engine</li>
+        <li><div class="feat-icon yes">✓</div>100,000 tasks / month</li>
+        <li><div class="feat-icon yes">✓</div>Email &amp; chat support</li>
+        <li><div class="feat-icon yes">✓</div>Standard API access</li>
+        <li class="dimmed"><div class="feat-icon no">–</div>Multi-agent coordination</li>
+        <li class="dimmed"><div class="feat-icon no">–</div>Predictive analytics</li>
+        <li class="dimmed"><div class="feat-icon no">–</div>Custom integrations</li>
+      </ul>
+      <a class="plan-cta outline" href="#cta">Get Started</a>
+    </div>
+
+    <!-- Pro (popular) -->
+    <div class="pricing-card popular">
+      <div class="popular-badge">⚡ Most Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-desc">For growing operations that need full AI-powered coordination and analytics.</div>
+      <div class="plan-price">
+        <span class="price-currency">$</span>
+        <span class="price-amount" id="price-pro">349</span>
+        <span class="price-period">&nbsp;/ mo</span>
+      </div>
+      <div class="price-billed" id="billed-pro">Billed monthly</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><div class="feat-icon yes">✓</div>Up to 25 connected systems</li>
+        <li><div class="feat-icon yes">✓</div>Real-time monitoring + anomaly alerts</li>
+        <li><div class="feat-icon yes">✓</div>Intelligent scheduling engine</li>
+        <li><div class="feat-icon yes">✓</div>2,000,000 tasks / month</li>
+        <li><div class="feat-icon yes">✓</div>Priority support (4hr SLA)</li>
+        <li><div class="feat-icon yes">✓</div>Full API + webhooks</li>
+        <li><div class="feat-icon yes">✓</div>Multi-agent coordination</li>
+        <li><div class="feat-icon yes">✓</div>Predictive analytics dashboard</li>
+        <li class="dimmed"><div class="feat-icon no">–</div>Custom integrations</li>
+      </ul>
+      <a class="plan-cta filled" href="#cta">Start Free Trial</a>
+    </div>
+
+    <!-- Enterprise -->
+    <div class="pricing-card">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-desc">Unlimited scale, dedicated support, and custom integrations for large organizations.</div>
+      <div class="plan-price">
+        <span class="price-currency"></span>
+        <span class="price-amount" style="font-size:2.2rem;letter-spacing:-0.02em" id="price-enterprise">Custom</span>
+      </div>
+      <div class="price-billed" id="billed-enterprise">Volume &amp; annual discounts available</div>
+      <div class="plan-divider"></div>
+      <ul class="plan-features">
+        <li><div class="feat-icon yes">✓</div>Unlimited connected systems</li>
+        <li><div class="feat-icon yes">✓</div>Real-time monitoring + anomaly alerts</li>
+        <li><div class="feat-icon yes">✓</div>Intelligent scheduling engine</li>
+        <li><div class="feat-icon yes">✓</div>Unlimited tasks</li>
+        <li><div class="feat-icon yes">✓</div>Dedicated success manager</li>
+        <li><div class="feat-icon yes">✓</div>Full API + webhooks + SSO</li>
+        <li><div class="feat-icon yes">✓</div>Multi-agent coordination</li>
+        <li><div class="feat-icon yes">✓</div>Predictive analytics + custom reports</li>
+        <li><div class="feat-icon yes">✓</div>Custom integrations &amp; on-premise option</li>
+      </ul>
+      <a class="plan-cta dark" href="#cta">Contact Sales</a>
+    </div>
+
+  </div><!-- /pricing-grid -->
+
+  <div class="pricing-footer">
+    All plans include a <a href="#cta">14-day free trial</a> — no credit card required.
+  </div>
+  <div class="pricing-guarantee">
+    <span>🔒</span> SOC 2 compliant &nbsp;·&nbsp; <span>💳</span> Cancel anytime &nbsp;·&nbsp; <span>🌍</span> Global infrastructure
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <p class="section-label" style="color:var(--purple-400)">Get Started</p>
+  <h2 class="section-title">Ready to Coordinate at Scale?</h2>
+  <p class="section-sub">Request a personalized demo and see how FluxCoord AI can transform your operations within weeks.</p>
+  <div class="cta-form">
+    <input class="cta-input" type="email" placeholder="Enter your work email" />
+    <a class="btn-primary" href="mailto:contact@fluxcoord.ai">Request Demo</a>
+  </div>
+  <p class="cta-note">No credit card required. Setup in under 30 minutes.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Flux<span>Coord</span> AI</div>
+  <p>© 2026 FluxCoord AI. Intelligent Coordination for Dynamic Systems.</p>
+  <div class="footer-links">
+    <a href="#about">About</a>
+    <a href="#features">Features</a>
+    <a href="#cta">Contact</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ─── Billing Toggle ─── */
+const PRICES = { starter:{monthly:99,annual:79}, pro:{monthly:349,annual:279} };
+let billingMode = 'monthly';
+
+function setBilling(mode) {
+  billingMode = mode;
+  const isAnnual = mode === 'annual';
+  document.getElementById('billing-thumb').classList.toggle('annual', isAnnual);
+  document.getElementById('lbl-monthly').classList.toggle('active', !isAnnual);
+  document.getElementById('lbl-annual').classList.toggle('active', isAnnual);
+  // Update prices
+  document.getElementById('price-starter').textContent = isAnnual ? PRICES.starter.annual : PRICES.starter.monthly;
+  document.getElementById('price-pro').textContent     = isAnnual ? PRICES.pro.annual     : PRICES.pro.monthly;
+  document.getElementById('billed-starter').innerHTML  = isAnnual
+    ? `Billed $${PRICES.starter.annual * 12}/yr &nbsp;<span class="saving">Save $${(PRICES.starter.monthly - PRICES.starter.annual)*12}</span>`
+    : 'Billed monthly';
+  document.getElementById('billed-pro').innerHTML      = isAnnual
+    ? `Billed $${PRICES.pro.annual * 12}/yr &nbsp;<span class="saving">Save $${(PRICES.pro.monthly - PRICES.pro.annual)*12}</span>`
+    : 'Billed monthly';
+}
+function toggleBilling() {
+  setBilling(billingMode === 'monthly' ? 'annual' : 'monthly');
+}
+
+/* ─── Industry Tabs ─── */
+function showIndustry(id) {
+  document.querySelectorAll('.industry-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.ind-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('ind-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+/* ─── Smooth scroll ─── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+
+/* ══════════════════════════════════
+   THREE.JS  —  MEP BIM 3D DEMO
+══════════════════════════════════ */
+(function() {
+  const wrap   = document.getElementById('three-canvas-wrap');
+  const canvas = document.getElementById('three-canvas');
+
+  /* Scene / Camera / Renderer */
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x06021a);
+  scene.fog = new THREE.FogExp2(0x06021a, 0.017);
+
+  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 400);
+  camera.position.set(32, 20, 32);
+  camera.lookAt(0, 0, 0);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  function onResize() {
+    const w = wrap.clientWidth, h = Math.max(460, wrap.clientHeight||460);
+    renderer.setSize(w, h, false);
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+  }
+  onResize();
+  window.addEventListener('resize', onResize);
+
+  /* Lighting */
+  scene.add(new THREE.AmbientLight(0xd0c8ff, 0.60));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+  sun.position.set(22, 40, 22); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0x7080ff, 0.38);
+  fill.position.set(-20, 10, -20); scene.add(fill);
+  const ptLight = new THREE.PointLight(0xa78bfa, 1.1, 90);
+  ptLight.position.set(0, 14, 0); scene.add(ptLight);
+
+  /* ── Helpers ── */
+  const UP = new THREE.Vector3(0,1,0);
+  function v(x,y,z){ return new THREE.Vector3(x,y,z); }
+  const _mc={};
+  function mat(hex,op=1,ei=0.18){
+    const k=`${hex}_${op}_${ei}`;
+    if(!_mc[k]) _mc[k]=new THREE.MeshPhongMaterial({color:hex,emissive:hex,emissiveIntensity:ei,shininess:70,transparent:op<1,opacity:op});
+    return _mc[k];
+  }
+  function orient(m,p1,p2){
+    const d=p2.clone().sub(p1).normalize(), dot=UP.dot(d);
+    if(dot>0.9999) return;
+    if(dot<-0.9999){m.rotation.z=Math.PI;return;}
+    m.quaternion.setFromUnitVectors(UP,d);
+  }
+  function pipe(grp,p1,p2,r,m){
+    const len=p1.distanceTo(p2); if(len<0.01)return;
+    const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,7,1),m);
+    mesh.position.copy(p1.clone().lerp(p2,0.5)); orient(mesh,p1,p2); grp.add(mesh);
+  }
+  function duct(grp,p1,p2,w,h,m){
+    const len=p1.distanceTo(p2); if(len<0.01)return;
+    const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,len,h),m);
+    mesh.position.copy(p1.clone().lerp(p2,0.5)); orient(mesh,p1,p2); grp.add(mesh);
+  }
+  function box(grp,x,y,z,w,h,d,m){
+    const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+    mesh.position.set(x,y,z); grp.add(mesh);
+  }
+
+  /* Trade groups inside pivot */
+  const G={structure:new THREE.Group(),hvac:new THREE.Group(),plumbing:new THREE.Group(),
+           fire:new THREE.Group(),electrical:new THREE.Group(),drain:new THREE.Group()};
+  const pivot=new THREE.Group();
+  Object.values(G).forEach(g=>pivot.add(g));
+  scene.add(pivot);
+  pivot.position.set(0,-7,0);
+
+  /* Colors */
+  const C={slab:0x546e7a,col:0x78909c,beam:0x607d8b,
+    hvacM:0x00e5ff,hvacB:0x00acc1,chwS:0x29b6f6,chwR:0x4dd0e1,
+    hwS:0xe040fb,hwR:0xce93d8,fireM:0xf44336,fireB:0xff8a80,
+    tray:0xff6e40,cond:0x546e7a,drain:0x66bb6a,vent:0xa5d6a7};
+
+  /* ══════════════════════════════
+     ENHANCED STRUCTURAL SYSTEM
+  ══════════════════════════════ */
+  const sg = G.structure;
+
+  // Structural material palette
+  const mSlab  = mat(0x607d8b, 0.20, 0.03);   // concrete slab (semi-transparent)
+  const mEdge  = mat(0x546e7a, 0.65, 0.05);   // slab edge / drop panel
+  const mCol   = mat(0xb0bec5, 1.00, 0.10);   // wide-flange steel column
+  const mBeam  = mat(0x90a4ae, 1.00, 0.08);   // primary I-beam
+  const mSecB  = mat(0x7986cb, 1.00, 0.07);   // secondary / filler beam
+  const mBase  = mat(0x455a64, 1.00, 0.04);   // column base plate
+  const mCore  = mat(0x8d9fa8, 0.82, 0.05);   // concrete core wall
+  const mGlass = mat(0x80deea, 0.09, 0.02);   // curtain wall vision glass
+  const mSpand = mat(0x546e7a, 0.80, 0.07);   // spandrel panel (opaque band)
+  const mMull  = mat(0xcfd8dc, 1.00, 0.06);   // aluminum mullion / frame
+  const mPrpet = mat(0x546e7a, 0.90, 0.05);   // parapet coping
+
+  const COL_X  = [-10,-6,-2,2,6,10];
+  const COL_Z  = [-6,-2,2,6];
+  const FLOORS = [0, 4.5, 9, 13.5];
+  const BH     = 13.5;          // total building height
+  const cyCtr  = BH / 2;        // vertical center
+
+  // ── Column profile dimensions (wide-flange W-shape) ──
+  const FW = 0.40;   // flange width  (X direction)
+  const FT = 0.065;  // flange thickness (Z direction)
+  const WD = 0.28;   // web depth (Z distance between flange faces)
+  const WT = 0.048;  // web thickness (X)
+
+  // ── H-Columns (3-piece per column: two flanges + web) ──
+  COL_X.forEach(cx => {
+    COL_Z.forEach(cz => {
+      // Front flange (z +)
+      box(sg, cx, cyCtr, cz + WD/2 + FT/2, FW, BH, FT, mCol);
+      // Back flange (z −)
+      box(sg, cx, cyCtr, cz - WD/2 - FT/2, FW, BH, FT, mCol);
+      // Web
+      box(sg, cx, cyCtr, cz, WT, BH, WD, mCol);
+      // Base plate (thicker square at foot)
+      box(sg, cx, -0.05, cz, FW+0.10, 0.06, WD+FT*2+0.10, mBase);
+      // Cap plate at top
+      box(sg, cx, BH+0.04, cz, FW+0.06, 0.04, WD+FT*2+0.06, mBase);
+    });
+  });
+
+  // ── Primary I-Beams per floor ──
+  // Profile: flangeW=0.34, flangeT=0.052, webD=0.22, webT=0.038
+  const PBfw=0.34, PBft=0.052, PBwd=0.22, PBwt=0.038;
+
+  [0.3, 4.8, 9.3].forEach(y => {
+    // X-direction beams (at each Z column line)
+    COL_Z.forEach(cz => {
+      box(sg, 0, y + PBwd/2 + PBft/2, cz,  24, PBft, PBfw, mBeam); // top flange
+      box(sg, 0, y - PBwd/2 - PBft/2, cz,  24, PBft, PBfw, mBeam); // bottom flange
+      box(sg, 0, y,                    cz,  24, PBwd, PBwt, mBeam); // web
+    });
+    // Z-direction beams (at each X column line)
+    COL_X.forEach(cx => {
+      box(sg, cx, y + PBwd/2 + PBft/2, 0,  PBfw, PBft, 16, mBeam); // top flange
+      box(sg, cx, y - PBwd/2 - PBft/2, 0,  PBfw, PBft, 16, mBeam); // bottom flange
+      box(sg, cx, y,                    0,  PBwt, PBwd, 16, mBeam); // web
+    });
+  });
+
+  // ── Secondary / Filler Beams (Z-direction, between primary X-beams) ──
+  // Lighter profile: fw=0.22, ft=0.038, wd=0.14, wt=0.028
+  const SBfw=0.22, SBft=0.038, SBwd=0.14, SBwt=0.028;
+  [-8,-4,0,4,8].forEach(sx => {
+    [0.3, 4.8, 9.3].forEach(y => {
+      box(sg, sx, y + SBwd/2 + SBft/2, 0,  SBfw, SBft, 16, mSecB);
+      box(sg, sx, y - SBwd/2 - SBft/2, 0,  SBfw, SBft, 16, mSecB);
+      box(sg, sx, y,                    0,  SBwt, SBwd, 16, mSecB);
+    });
+  });
+
+  // ── Concrete Floor Slabs (with edge thickening) ──
+  FLOORS.forEach(y => {
+    // Main slab
+    box(sg, 0, y, 0, 24, 0.20, 16, mSlab);
+    // Edge beam / drop at perimeter
+    box(sg, 0,   y-0.22,  8.0,  24, 0.22, 0.30, mEdge); // front edge
+    box(sg, 0,   y-0.22, -8.0,  24, 0.22, 0.30, mEdge); // back edge
+    box(sg,-12,  y-0.22,  0,   0.30, 0.22, 16,  mEdge); // left edge
+    box(sg, 12,  y-0.22,  0,   0.30, 0.22, 16,  mEdge); // right edge
+  });
+
+  // ── Concrete Core (elevator + stair shaft) ──
+  // 3.2 × 3.2 walls, centred at (x=5, z=0)
+  const coreX=5, coreW=3.2, coreD=3.2, coreT=0.22;
+  // Four walls
+  box(sg, coreX,            cyCtr,  coreD/2,        coreW,    BH, coreT, mCore); // front wall
+  box(sg, coreX,            cyCtr, -coreD/2,        coreW,    BH, coreT, mCore); // back wall
+  box(sg, coreX - coreW/2,  cyCtr,  0,              coreT,    BH, coreD, mCore); // left wall
+  box(sg, coreX + coreW/2,  cyCtr,  0,              coreT,    BH, coreD, mCore); // right wall
+  // Core cap
+  box(sg, coreX, BH+0.12, 0, coreW, 0.12, coreD, mEdge);
+
+  // ── Curtain Wall Facade (all 4 elevations) ──
+  for (let fi = 0; fi < FLOORS.length-1; fi++) {
+    const yBot = FLOORS[fi], yTop = FLOORS[fi+1], yMid = (yBot+yTop)/2;
+    const fh   = yTop - yBot;
+
+    // Spandrel band height & glass height per floor
+    const spH  = fh * 0.22;   // opaque spandrel at top of each floor
+    const glH  = fh * 0.68;   // vision glass height
+
+    /* ── FRONT face z = +8 ── */
+    for (let ci = 0; ci < COL_X.length - 1; ci++) {
+      const cx0 = COL_X[ci]   + FW/2 + 0.06;
+      const cx1 = COL_X[ci+1] - FW/2 - 0.06;
+      const pw  = cx1 - cx0, pcx = (cx0+cx1)/2;
+      box(sg, pcx, yMid - spH/2 + 0.05, 8.03, pw, glH,   0.04, mGlass);  // glass
+      box(sg, pcx, yTop - spH/2,         8.02, pw, spH,   0.06, mSpand);  // spandrel
+      box(sg, pcx, yMid,                 8.04, 0.04, fh, 0.04, mMull);    // centre mullion
+    }
+    box(sg, 0, yBot+0.08, 8.03, 24, 0.05, 0.04, mMull); // sill rail
+    box(sg, 0, yTop-0.05, 8.03, 24, 0.05, 0.04, mMull); // head rail
+
+    /* ── BACK face z = −8 ── */
+    for (let ci = 0; ci < COL_X.length - 1; ci++) {
+      const cx0 = COL_X[ci]   + FW/2 + 0.06;
+      const cx1 = COL_X[ci+1] - FW/2 - 0.06;
+      const pw  = cx1-cx0, pcx = (cx0+cx1)/2;
+      box(sg, pcx, yMid - spH/2 + 0.05, -8.03, pw, glH,  0.04, mGlass);
+      box(sg, pcx, yTop - spH/2,         -8.02, pw, spH,  0.06, mSpand);
+      box(sg, pcx, yMid,                 -8.04, 0.04, fh, 0.04, mMull);
+    }
+    box(sg, 0, yBot+0.08, -8.03, 24, 0.05, 0.04, mMull);
+
+    /* ── LEFT face x = −12 ── */
+    for (let ci = 0; ci < COL_Z.length - 1; ci++) {
+      const cz0 = COL_Z[ci]   + WD/2 + FT + 0.06;
+      const cz1 = COL_Z[ci+1] - WD/2 - FT - 0.06;
+      const pw  = cz1-cz0, pcz = (cz0+cz1)/2;
+      box(sg, -12.03, yMid - spH/2 + 0.05, pcz, 0.04, glH,  pw, mGlass);
+      box(sg, -12.02, yTop - spH/2,         pcz, 0.06, spH,  pw, mSpand);
+      box(sg, -12.04, yMid,                 pcz, 0.04, fh, 0.04, mMull);
+    }
+    box(sg, -12.03, yBot+0.08, 0, 0.04, 0.05, 16, mMull);
+
+    /* ── RIGHT face x = +12 ── */
+    for (let ci = 0; ci < COL_Z.length - 1; ci++) {
+      const cz0 = COL_Z[ci]   + WD/2 + FT + 0.06;
+      const cz1 = COL_Z[ci+1] - WD/2 - FT - 0.06;
+      const pw  = cz1-cz0, pcz = (cz0+cz1)/2;
+      box(sg, 12.03, yMid - spH/2 + 0.05, pcz, 0.04, glH,  pw, mGlass);
+      box(sg, 12.02, yTop - spH/2,         pcz, 0.06, spH,  pw, mSpand);
+      box(sg, 12.04, yMid,                 pcz, 0.04, fh, 0.04, mMull);
+    }
+    box(sg, 12.03, yBot+0.08, 0, 0.04, 0.05, 16, mMull);
+  }
+
+  // ── Roof parapet ──
+  box(sg,  0,   BH+0.25,  8.0, 24,   0.32, 0.22, mPrpet);
+  box(sg,  0,   BH+0.25, -8.0, 24,   0.32, 0.22, mPrpet);
+  box(sg,-12,   BH+0.25,  0,   0.22, 0.32, 16,   mPrpet);
+  box(sg, 12,   BH+0.25,  0,   0.22, 0.32, 16,   mPrpet);
+  // Roof slab
+  box(sg,  0,   BH+0.09,  0,   24,   0.10, 16,   mSlab);
+
+  /* ── MEP per floor ── */
+  [3.9,8.4,12.9].forEach(base=>{
+    /* HVAC */
+    duct(G.hvac,v(-12,base,0),v(12,base,0),0.95,0.52,mat(C.hvacM,1,0.25));
+    duct(G.hvac,v(-12,base-0.12,4.5),v(12,base-0.12,4.5),0.78,0.42,mat(C.hvacM,1,0.22));
+    [-10,-6,-2,2,6,10].forEach(bx=>duct(G.hvac,v(bx,base-0.22,-7),v(bx,base-0.22,7),0.48,0.30,mat(C.hvacB,1,0.20)));
+    [-5.5,-3.5,-1.5,1.5,3.5,5.5].forEach(bz=>duct(G.hvac,v(-12,base-0.32,bz),v(12,base-0.32,bz),0.26,0.18,mat(C.hvacB,1,0.15)));
+    /* CHW */
+    pipe(G.plumbing,v(-12,base-0.52,-2.2),v(12,base-0.52,-2.2),0.14,mat(C.chwS));
+    pipe(G.plumbing,v(-12,base-0.52,-1.4),v(12,base-0.52,-1.4),0.11,mat(C.chwR));
+    [-10,-6,-2,2,6,10].forEach(cx=>pipe(G.plumbing,v(cx,base-0.5,-2.2),v(cx,base-1.5,-2.2),0.12,mat(C.chwS)));
+    /* HW */
+    pipe(G.plumbing,v(-12,base-0.62,1.8),v(12,base-0.62,1.8),0.11,mat(C.hwS));
+    pipe(G.plumbing,v(-12,base-0.62,1.0),v(12,base-0.62,1.0),0.09,mat(C.hwR));
+    [-10,-6,-2,2,6,10].forEach(cx=>{
+      pipe(G.plumbing,v(cx,base-0.6,1.8),v(cx,base-1.5,1.8),0.10,mat(C.hwS));
+      pipe(G.plumbing,v(cx,base-0.62,1.0),v(cx,base-0.62,1.8),0.07,mat(C.hwR));
+    });
+    /* FIRE */
+    pipe(G.fire,v(-12,base-0.72,-5.5),v(12,base-0.72,-5.5),0.09,mat(C.fireM));
+    pipe(G.fire,v(-12,base-0.72,6.0), v(12,base-0.72,6.0), 0.09,mat(C.fireM));
+    [-10,-6,-2,2,6,10].forEach(bx=>pipe(G.fire,v(bx,base-0.72,-7),v(bx,base-0.72,7),0.065,mat(C.fireM)));
+    for(let sx=-11;sx<=11;sx+=2.5)for(let sz=-6.5;sz<=6.5;sz+=2.5){
+      pipe(G.fire,v(sx,base-0.72,sz),v(sx,base-1.05,sz),0.028,mat(C.fireB));
+      const h=new THREE.Mesh(new THREE.SphereGeometry(0.06,5,5),mat(C.fireB));
+      h.position.set(sx,base-1.08,sz); G.fire.add(h);
+    }
+    /* CABLE TRAYS */
+    duct(G.electrical,v(-12,base-0.42,-6.0),v(12,base-0.42,-6.0),0.58,0.06,mat(C.tray));
+    duct(G.electrical,v(-12,base-0.42, 6.0),v(12,base-0.42, 6.0),0.58,0.06,mat(C.tray));
+    duct(G.electrical,v(-12,base-0.52, 0),  v(12,base-0.52, 0),  0.42,0.05,mat(C.tray));
+    [-10,-6,-2,2,6,10].forEach(bx=>duct(G.electrical,v(bx,base-0.46,-7),v(bx,base-0.46,7),0.32,0.05,mat(C.tray)));
+    /* CONDUITS */
+    [-7.3,-7.0,-6.7,7.3,7.0,6.7].forEach(cz=>pipe(G.electrical,v(-12,base-0.58,cz),v(12,base-0.58,cz),0.042,mat(C.cond)));
+    [-0.25,0,0.25,0.5,-0.5].forEach(off=>pipe(G.electrical,v(-12,base-0.64,off),v(12,base-0.64,off),0.036,mat(C.cond)));
+    /* DRAIN */
+    pipe(G.drain,v(-12,base-0.85,-7.2),v(12,base-0.85,-7.2),0.09,mat(C.drain));
+    pipe(G.drain,v(-12,base-0.85, 7.2),v(12,base-0.85, 7.2),0.09,mat(C.drain));
+    [-10,-6,-2,2,6,10].forEach(cx=>pipe(G.drain,v(cx-0.6,base,-7.2),v(cx-0.6,base-4.5,-7.2),0.075,mat(C.drain)));
+    [-5,-2.5,0,2.5,5].forEach(vz=>pipe(G.drain,v(11.2,base-0.85,vz),v(11.2,base+2.8,vz),0.038,mat(C.vent)));
+  });
+
+  /* Grid */
+  const grid=new THREE.GridHelper(50,25,0x7c3aed,0x1a0a2e);
+  grid.position.y=-0.1; grid.material.transparent=true; grid.material.opacity=0.28;
+  pivot.add(grid);
+
+  /* ── Flow particles ── */
+  const ROUTES=[];
+  [3.9,8.4,12.9].forEach((base,fi)=>{
+    ROUTES.push(
+      {p1:v(-12,base,0),       p2:v(12,base,0),       col:0x00e5ff,spd:0.007+fi*0.001},
+      {p1:v(-12,base-0.12,4.5),p2:v(12,base-0.12,4.5),col:0x00bcd4,spd:0.006},
+      {p1:v(-12,base-0.52,-2.2),p2:v(12,base-0.52,-2.2),col:0x29b6f6,spd:0.006},
+      {p1:v(-12,base-0.62,1.8), p2:v(12,base-0.62,1.8), col:0xe040fb,spd:0.005},
+      {p1:v(-12,base-0.72,-5.5),p2:v(12,base-0.72,-5.5),col:0xf44336,spd:0.008},
+      {p1:v(-12,base-0.85,-7.2),p2:v(12,base-0.85,-7.2),col:0x66bb6a,spd:0.004},
+      {p1:v(6,base-0.22,-7),    p2:v(6,base-0.22,7),    col:0x00e5ff,spd:0.007}
+    );
+  });
+  const particles=[];
+  const pGroup=new THREE.Group(); pivot.add(pGroup);
+  ROUTES.forEach(rt=>{
+    for(let k=0;k<3;k++){
+      const mesh=new THREE.Mesh(new THREE.SphereGeometry(0.14,5,5),
+        new THREE.MeshBasicMaterial({color:rt.col,transparent:true,opacity:0.92}));
+      particles.push({mesh,rt,t:k/3}); pGroup.add(mesh);
+    }
+  });
+
+  /* ── Interaction ── */
+  let isDrag=false,px=0,py=0,rotY=0.55,rotX=0.38,autoRot=true;
+  canvas.addEventListener('mousedown',e=>{isDrag=true;px=e.clientX;py=e.clientY;});
+  window.addEventListener('mouseup',()=>isDrag=false);
+  window.addEventListener('mousemove',e=>{
+    if(!isDrag)return;
+    rotY+=(e.clientX-px)*0.008; rotX+=(e.clientY-py)*0.005;
+    rotX=Math.max(-0.55,Math.min(0.65,rotX)); px=e.clientX;py=e.clientY;
+    autoRot=false; document.getElementById('btn-rotate').classList.remove('active');
+  });
+  let tp=null;
+  canvas.addEventListener('touchstart',e=>{isDrag=true;tp={x:e.touches[0].clientX,y:e.touches[0].clientY};});
+  canvas.addEventListener('touchend',()=>isDrag=false);
+  canvas.addEventListener('touchmove',e=>{
+    if(!isDrag||!tp)return;
+    rotY+=(e.touches[0].clientX-tp.x)*0.008;rotX+=(e.touches[0].clientY-tp.y)*0.005;
+    tp={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  });
+  wrap.addEventListener('wheel',e=>{
+    camera.position.multiplyScalar(Math.max(0.5,Math.min(2.2,1+e.deltaY*0.001)));
+    e.preventDefault();
+  },{passive:false});
+
+  /* ── Global controls ── */
+  window.toggleRotate=function(btn){autoRot=!autoRot;btn.classList.toggle('active',autoRot);};
+  window.toggleTrade=function(trade,btn){const g=G[trade];if(g){g.visible=!g.visible;btn.classList.toggle('active',g.visible);}};
+  window.resetSim=function(){
+    rotY=0.55;rotX=0.38;autoRot=true;camera.position.set(32,20,32);
+    Object.values(G).forEach(g=>g.visible=true);
+    document.querySelectorAll('.trade-btn').forEach(b=>b.classList.add('active'));
+    document.getElementById('btn-rotate').classList.add('active');
+    pushLog(true,'✓ View reset — all trades visible');
+  };
+  window.runClashDetection=function(){
+    const n=Math.floor(Math.random()*10)+2;
+    document.getElementById('clash-count').textContent=n;
+    document.getElementById('clash-status').textContent=n>6?'⚠ Review needed':'✓ Minor clashes';
+    pushLog(false,`⚠ ${n} hard clashes detected`);
+    setTimeout(()=>pushLog(true,`✓ ${Math.floor(n*0.7)} clashes auto-resolved`),1600);
+  };
+
+  /* ── MEP log ── */
+  const LP=[
+    [true, '✓ HVAC duct routing optimized'],
+    [false,'⚠ Clash: HVAC × CHW at FL02 Zone-B'],
+    [true, '✓ Duct raised 150mm — clash cleared'],
+    [true, '✓ Fire loop pressure check passed'],
+    [false,'⚠ Cable tray clearance <50mm FL01'],
+    [true, '✓ Conduit rerouted — clearance OK'],
+    [true, '✓ BIM model synced — LOD 350'],
+    [false,'⚠ Sprinkler conflict FL03/Zone-C'],
+    [true, '✓ Sprinkler layout revised & approved'],
+    [true, '✓ Drain slope gradient verified'],
+    [false,'⚠ HW expansion loop missing FL02'],
+    [true, '✓ Expansion loop added — X-axis 4'],
+    [true, '✓ Coordination model export ready'],
+  ];
+  let logIdx=0;
+  function pushLog(ok,msg){
+    const slog=document.getElementById('slog'); if(!slog)return;
+    const now=new Date();
+    const t=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    const div=document.createElement('div');
+    div.className='slog-entry';
+    div.innerHTML=`<span class="slog-time">${t}</span><span class="${ok?'slog-ok':'slog-warn'}">${msg}</span>`;
+    slog.prepend(div);
+    while(slog.children.length>7)slog.removeChild(slog.lastChild);
+  }
+  setInterval(()=>{
+    const[ok,msg]=LP[logIdx%LP.length];logIdx++;pushLog(ok,msg);
+    document.getElementById('kpi-nodes').textContent=220+Math.floor(Math.random()*30);
+  },3200);
+
+  /* ── Animate ── */
+  let frame=0;
+  function animate(){
+    requestAnimationFrame(animate); frame++;
+    if(autoRot)rotY+=0.003;
+    pivot.rotation.y=rotY; pivot.rotation.x=rotX;
+    particles.forEach(pk=>{pk.t=(pk.t+pk.rt.spd)%1;pk.mesh.position.lerpVectors(pk.rt.p1,pk.rt.p2,pk.t);});
+    ptLight.intensity=1.1+Math.sin(frame*0.025)*0.3;
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  setTimeout(()=>pushLog(true,'✓ MEP coordination model loaded'),300);
+  setTimeout(()=>pushLog(true,'✓ 3 floors — 247 elements registered'),800);
+  setTimeout(()=>pushLog(false,'⚠ 12 hard clashes flagged for review'),1400);
+})();
+</script>
+
+<!-- ══ FIREBASE AUTH ═══════════════════════════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// 🔥 FIREBASE CONFIG — Replace these values with your own project keys
+//
+//  HOW TO GET YOUR KEYS (5 minutes):
+//  1. Go to https://console.firebase.google.com
+//  2. Click "Add project" (or open an existing project)
+//  3. In the left sidebar → Project Settings (gear icon)
+//  4. Scroll to "Your apps" → click </> (Web)
+//  5. Register app name → copy the firebaseConfig object below
+//  6. Back in Firebase: Authentication → Sign-in method
+//     → Enable "Email/Password"
+//     → Enable "Google"  ← (add your domain under Authorised domains too)
+// ─────────────────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+
+// Init — guard against double-init during hot reload
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+// ── Modal helpers ─────────────────────────────────────────────────────────────
+function openAuth(tab) {
+  document.getElementById('auth-overlay').classList.add('open');
+  switchTab(tab || 'signin');
+  clearAuthMessages();
+  // focus first input after transition
+  setTimeout(() => {
+    const f = document.querySelector('#auth-overlay input:not([disabled])');
+    if (f) f.focus();
+  }, 280);
+}
+function closeAuth() {
+  document.getElementById('auth-overlay').classList.remove('open');
+}
+function handleOverlayClick(e) {
+  if (e.target.id === 'auth-overlay') closeAuth();
+}
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  const isSignin = (tab === 'signin');
+  document.getElementById('form-signin').style.display = isSignin ? 'flex' : 'none';
+  document.getElementById('form-signup').style.display = isSignin ? 'none' : 'flex';
+  document.getElementById('tab-signin').classList.toggle('active',  isSignin);
+  document.getElementById('tab-signup').classList.toggle('active', !isSignin);
+  document.getElementById('auth-switch-text').innerHTML = isSignin
+    ? "Don't have an account? <a onclick=\"switchTab('signup')\">Sign up free</a>"
+    : "Already have an account? <a onclick=\"switchTab('signin')\">Sign in</a>";
+  clearAuthMessages();
+}
+
+// ── Message helpers ───────────────────────────────────────────────────────────
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+function showAuthSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('auth-error').classList.remove('show');
+}
+function clearAuthMessages() {
+  document.getElementById('auth-error').classList.remove('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+function setLoading(btnId, loading, label) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? '<span class="spinner"></span> Please wait…'
+    : label;
+}
+
+// ── Auth actions ──────────────────────────────────────────────────────────────
+async function handleSignIn(e) {
+  e.preventDefault();
+  clearAuthMessages();
+  const email = document.getElementById('si-email').value.trim();
+  const pass  = document.getElementById('si-password').value;
+  setLoading('btn-signin', true, 'Sign In');
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    closeAuth();
+  } catch(err) {
+    showAuthError(friendlyError(err.code));
+  } finally {
+    setLoading('btn-signin', false, 'Sign In');
+  }
+}
+
+async function handleSignUp(e) {
+  e.preventDefault();
+  clearAuthMessages();
+  const name    = document.getElementById('su-name').value.trim();
+  const email   = document.getElementById('su-email').value.trim();
+  const pass    = document.getElementById('su-password').value;
+  const confirm = document.getElementById('su-confirm').value;
+  if (pass !== confirm) { showAuthError('Passwords do not match.'); return; }
+  if (pass.length < 8)  { showAuthError('Password must be at least 8 characters.'); return; }
+  setLoading('btn-signup', true, 'Create Account');
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pass);
+    await cred.user.updateProfile({ displayName: name });
+    closeAuth();
+  } catch(err) {
+    showAuthError(friendlyError(err.code));
+  } finally {
+    setLoading('btn-signup', false, 'Create Account');
+  }
+}
+
+async function handleGoogleAuth() {
+  clearAuthMessages();
+  try {
+    await auth.signInWithPopup(googleProvider);
+    closeAuth();
+  } catch(err) {
+    if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      showAuthError(friendlyError(err.code));
+    }
+  }
+}
+
+async function handleForgotPassword() {
+  clearAuthMessages();
+  const email = document.getElementById('si-email').value.trim();
+  if (!email) { showAuthError('Enter your email above, then click "Forgot password".'); return; }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    showAuthSuccess('Password reset email sent! Check your inbox.');
+  } catch(err) {
+    showAuthError(friendlyError(err.code));
+  }
+}
+
+async function signOutUser() {
+  closeDropdown();
+  await auth.signOut();
+}
+
+// ── Dropdown ──────────────────────────────────────────────────────────────────
+function toggleDropdown(e) {
+  e && e.stopPropagation();
+  document.getElementById('nav-dropdown').classList.toggle('open');
+}
+function closeDropdown() {
+  document.getElementById('nav-dropdown').classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  const zone = document.getElementById('nav-user');
+  if (zone && !zone.contains(e.target)) closeDropdown();
+});
+
+// ── Auth state observer ───────────────────────────────────────────────────────
+auth.onAuthStateChanged(function(user) {
+  const loginBtn  = document.getElementById('nav-login-btn');
+  const navUser   = document.getElementById('nav-user');
+  const navAvatar = document.getElementById('nav-avatar');
+  const navName   = document.getElementById('nav-user-name');
+  const ddEmail   = document.getElementById('nav-dd-email');
+
+  if (user) {
+    // ── Signed in ──
+    if (loginBtn) loginBtn.style.display = 'none';
+    navUser.classList.add('visible');
+
+    const displayName = user.displayName || user.email.split('@')[0] || 'User';
+    navName.textContent = displayName;
+    ddEmail.textContent = user.email;
+
+    if (user.photoURL) {
+      navAvatar.innerHTML =
+        '<img src="' + user.photoURL + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">';
+    } else {
+      const initials = displayName.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase() || '?';
+      navAvatar.textContent = initials;
+    }
+  } else {
+    // ── Signed out ──
+    if (loginBtn) loginBtn.style.display = '';
+    navUser.classList.remove('visible');
+    navAvatar.textContent = '?';
+    navName.textContent   = '';
+  }
+});
+
+// ── Keyboard: close on Escape ─────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeAuth();
+});
+
+// ── Human-readable error messages ────────────────────────────────────────────
+function friendlyError(code) {
+  var map = {
+    'auth/invalid-email':            'Please enter a valid email address.',
+    'auth/user-not-found':           'No account found with this email address.',
+    'auth/wrong-password':           'Incorrect password. Please try again.',
+    'auth/invalid-credential':       'Incorrect email or password. Please try again.',
+    'auth/email-already-in-use':     'An account with this email already exists. Try signing in.',
+    'auth/weak-password':            'Password should be at least 8 characters.',
+    'auth/too-many-requests':        'Too many failed attempts. Please wait a moment and try again.',
+    'auth/network-request-failed':   'Network error. Please check your internet connection.',
+    'auth/popup-blocked':            'Pop-up was blocked by your browser. Please allow pop-ups for this site.',
+    'auth/operation-not-allowed':    'This sign-in method is not enabled. Enable it in Firebase Console → Authentication.',
+    'auth/requires-recent-login':    'Please sign out and sign in again to continue.',
+    'auth/user-disabled':            'This account has been disabled. Contact support.',
+  };
+  return map[code] || 'Something went wrong (' + code + '). Please try again.';
+}
+</script>
 </body>
 </html>
