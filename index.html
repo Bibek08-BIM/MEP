@@ -581,11 +581,110 @@
       flex: 1; min-width: 220px; padding: 0.85rem 1.25rem;
       background: rgba(255,255,255,0.07); border: 1px solid rgba(167,139,250,0.3);
       border-radius: 10px; color: var(--white); font-size: 0.95rem;
-      outline: none;
+      outline: none; transition: border-color 0.2s;
     }
     .cta-input::placeholder { color: rgba(255,255,255,0.35); }
     .cta-input:focus { border-color: var(--purple-400); }
     .cta-note { font-size: 0.8rem; color: rgba(255,255,255,0.35); margin-top: 1rem; }
+    .cta-email-err { font-size: 0.8rem; color: #f87171; margin-top: 0.5rem; min-height: 1.1em; }
+
+    /* ── PERSONALIZED DEMO OVERLAY ── */
+    #pdemo-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: var(--dark-900); flex-direction: column; overflow: hidden;
+    }
+    #pdemo-overlay.open { display: flex; animation: pdemoFadeIn 0.45s ease; }
+    @keyframes pdemoFadeIn { from{opacity:0;transform:scale(0.97)} to{opacity:1;transform:scale(1)} }
+
+    .pdemo-topbar {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem; height: 56px;
+      background: rgba(15,10,30,0.95); border-bottom: 1px solid rgba(139,92,246,0.2);
+      backdrop-filter: blur(12px);
+    }
+    .pdemo-brand { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    .pdemo-brand span { color: var(--purple-400); }
+    .pdemo-welcome {
+      font-size: 0.78rem; color: rgba(255,255,255,0.45);
+    }
+    .pdemo-welcome strong { color: var(--cyan-400); }
+    .pdemo-close {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      color: #fff; border-radius: 8px; padding: 0.35rem 0.9rem;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .pdemo-close:hover { background: rgba(255,255,255,0.12); }
+
+    .pdemo-body {
+      flex: 1; display: grid; grid-template-columns: 1fr 280px;
+      overflow: hidden;
+    }
+    @media(max-width:800px){ .pdemo-body { grid-template-columns: 1fr; } }
+
+    #pdemo-canvas { display: block; width: 100%; height: 100%; }
+
+    .pdemo-sidebar {
+      border-left: 1px solid rgba(139,92,246,0.15);
+      background: rgba(10,5,20,0.9); overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .pdemo-sec {
+      padding: 1rem 1.1rem; border-bottom: 1px solid rgba(139,92,246,0.1);
+    }
+    .pdemo-sec-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.65rem;
+    }
+    .pdemo-trade-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem;
+    }
+    .pdemo-trade-btn {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.45rem 0.6rem; border-radius: 8px; font-size: 0.75rem; font-weight: 600;
+      cursor: pointer; border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.6);
+      transition: all 0.2s;
+    }
+    .pdemo-trade-btn.active {
+      background: rgba(255,255,255,0.1); color: #fff;
+      border-color: rgba(255,255,255,0.25);
+    }
+    .pdemo-trade-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .pdemo-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+    .pdemo-stat {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(139,92,246,0.15);
+      border-radius: 8px; padding: 0.55rem 0.6rem; text-align: center;
+    }
+    .pdemo-stat-val { font-size: 1.15rem; font-weight: 800; color: var(--purple-400); }
+    .pdemo-stat-lbl { font-size: 0.65rem; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+    .pdemo-clash-box {
+      background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25);
+      border-radius: 10px; padding: 0.7rem 0.85rem; display: flex; align-items: center; gap: 0.75rem;
+    }
+    .pdemo-clash-num { font-size: 2rem; font-weight: 900; color: #fbbf24; line-height: 1; }
+    .pdemo-clash-label { font-size: 0.75rem; font-weight: 700; color: #fbbf24; }
+    .pdemo-clash-sub { font-size: 0.68rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+    .pdemo-log {
+      max-height: 160px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .pdemo-log-row {
+      display: flex; gap: 0.45rem; align-items: flex-start;
+    }
+    .pdemo-log-time { font-size: 0.66rem; color: var(--cyan-400); flex-shrink: 0; margin-top: 1px; }
+    .pdemo-log-msg { font-size: 0.72rem; color: rgba(255,255,255,0.65); }
+
+    .pdemo-footbar {
+      flex-shrink: 0; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(124,58,237,0.08); border-top: 1px solid rgba(139,92,246,0.15);
+      font-size: 0.72rem; color: rgba(255,255,255,0.3); gap: 0.5rem;
+    }
+    .pdemo-footbar span { color: var(--cyan-400); }
 
     /* ── PRICING ── */
     #pricing { background: var(--gray-50); }
@@ -1611,13 +1710,105 @@
 <section id="cta">
   <p class="section-label" style="color:var(--purple-400)">Get Started</p>
   <h2 class="section-title">Ready to Coordinate at Scale?</h2>
-  <p class="section-sub">Request a personalized demo and see how FluxCoord AI can transform your operations within weeks.</p>
-  <div class="cta-form">
-    <input class="cta-input" type="email" placeholder="Enter your work email" />
-    <a class="btn-primary" href="mailto:contact@fluxcoord.ai">Request Demo</a>
-  </div>
+  <p class="section-sub">Enter your work email and instantly explore a live Revit BIM model with all MEP trades — no download needed.</p>
+  <form class="cta-form" id="cta-form" onsubmit="ctaRequestDemo(event)">
+    <input class="cta-input" id="cta-email" type="email" placeholder="Enter your work email" autocomplete="email" required />
+    <button class="btn-primary" type="submit">View Live Demo →</button>
+  </form>
+  <p class="cta-email-err" id="cta-err"></p>
   <p class="cta-note">No credit card required. Setup in under 30 minutes.</p>
 </section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PERSONALIZED DEMO OVERLAY — Full-screen Revit BIM 3D Model
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="pdemo-overlay">
+
+  <!-- Top bar -->
+  <div class="pdemo-topbar">
+    <div class="pdemo-brand">Flux<span>Coord</span> AI</div>
+    <div class="pdemo-welcome">Personalized demo for <strong id="pdemo-email-label">you</strong></div>
+    <button class="pdemo-close" onclick="closePdemo()">✕ Close</button>
+  </div>
+
+  <!-- Body: canvas + sidebar -->
+  <div class="pdemo-body">
+    <canvas id="pdemo-canvas"></canvas>
+
+    <div class="pdemo-sidebar">
+
+      <!-- Trade toggles -->
+      <div class="pdemo-sec">
+        <div class="pdemo-sec-label">MEP Trades — Toggle Layers</div>
+        <div class="pdemo-trade-grid">
+          <button class="pdemo-trade-btn active" id="pt-hvac"       onclick="pdemoToggle('hvac',this)">
+            <div class="pdemo-trade-dot" style="background:#00e5ff"></div>HVAC
+          </button>
+          <button class="pdemo-trade-btn active" id="pt-plumbing"   onclick="pdemoToggle('plumbing',this)">
+            <div class="pdemo-trade-dot" style="background:#e040fb"></div>Plumbing
+          </button>
+          <button class="pdemo-trade-btn active" id="pt-fire"       onclick="pdemoToggle('fire',this)">
+            <div class="pdemo-trade-dot" style="background:#f44336"></div>Fire
+          </button>
+          <button class="pdemo-trade-btn active" id="pt-electrical" onclick="pdemoToggle('electrical',this)">
+            <div class="pdemo-trade-dot" style="background:#ff6e40"></div>Electrical
+          </button>
+          <button class="pdemo-trade-btn active" id="pt-drain"      onclick="pdemoToggle('drain',this)">
+            <div class="pdemo-trade-dot" style="background:#66bb6a"></div>Drain
+          </button>
+          <button class="pdemo-trade-btn active" id="pt-structure"  onclick="pdemoToggle('structure',this)">
+            <div class="pdemo-trade-dot" style="background:#90a4ae"></div>Structure
+          </button>
+        </div>
+      </div>
+
+      <!-- Clash stats -->
+      <div class="pdemo-sec">
+        <div class="pdemo-sec-label">Active Clashes</div>
+        <div class="pdemo-clash-box">
+          <div class="pdemo-clash-num" id="pdemo-clash-num">7</div>
+          <div>
+            <div class="pdemo-clash-label">⚠ Hard clashes</div>
+            <div class="pdemo-clash-sub">Auto-ranked by severity</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="pdemo-sec">
+        <div class="pdemo-sec-label">Model Stats</div>
+        <div class="pdemo-stat-grid">
+          <div class="pdemo-stat"><div class="pdemo-stat-val">4</div><div class="pdemo-stat-lbl">Floors</div></div>
+          <div class="pdemo-stat"><div class="pdemo-stat-val">312</div><div class="pdemo-stat-lbl">Elements</div></div>
+          <div class="pdemo-stat"><div class="pdemo-stat-val">LOD 350</div><div class="pdemo-stat-lbl">Detail Level</div></div>
+          <div class="pdemo-stat"><div class="pdemo-stat-val">6</div><div class="pdemo-stat-lbl">Trades</div></div>
+        </div>
+      </div>
+
+      <!-- Hint -->
+      <div class="pdemo-sec">
+        <div class="pdemo-sec-label">Navigation</div>
+        <div style="font-size:0.73rem;color:rgba(255,255,255,0.45);line-height:1.6">
+          🖱 <strong style="color:#fff">Drag</strong> to rotate<br>
+          🖱 <strong style="color:#fff">Scroll</strong> to zoom<br>
+          🖱 <strong style="color:#fff">Right-drag</strong> to pan
+        </div>
+      </div>
+
+      <!-- Live log -->
+      <div class="pdemo-sec" style="flex:1">
+        <div class="pdemo-sec-label">Coordination Log</div>
+        <div class="pdemo-log" id="pdemo-log"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Footer bar -->
+  <div class="pdemo-footbar">
+    🔴 <span>LIVE</span> &nbsp;·&nbsp; FluxCoord AI &nbsp;·&nbsp; Revit BIM Model &nbsp;·&nbsp; All MEP Trades Active &nbsp;·&nbsp; 🖱 Drag to rotate
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -2149,213 +2340,290 @@ function clearAuthMessages() {
   document.getElementById('auth-error').classList.remove('show');
   document.getElementById('auth-success').classList.remove('show');
 }
-function setLoading(btnId, loading, label) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.disabled = loading;
-  btn.innerHTML = loading
-    ? '<span class="spinner"></span> Please wait…'
-    : label;
-}
 
-// ── Auth actions ──────────────────────────────────────────────────────────────
-async function handleSignIn(e) {
-  e.preventDefault();
-  clearAuthMessages();
-  const email = document.getElementById('si-email').value.trim();
-  const pass  = document.getElementById('si-password').value;
-  setLoading('btn-signin', true, 'Sign In');
-  try {
-    await auth.signInWithEmailAndPassword(email, pass);
-    closeAuth();
-  } catch(err) {
-    showAuthError(friendlyError(err.code));
-  } finally {
-    setLoading('btn-signin', false, 'Sign In');
-  }
-}
-
-async function handleSignUp(e) {
-  e.preventDefault();
-  clearAuthMessages();
-  const name    = document.getElementById('su-name').value.trim();
-  const email   = document.getElementById('su-email').value.trim();
-  const pass    = document.getElementById('su-password').value;
-  const confirm = document.getElementById('su-confirm').value;
-  if (pass !== confirm) { showAuthError('Passwords do not match.'); return; }
-  if (pass.length < 8)  { showAuthError('Password must be at least 8 characters.'); return; }
-  setLoading('btn-signup', true, 'Create Account');
-  try {
-    const cred = await auth.createUserWithEmailAndPassword(email, pass);
-    await cred.user.updateProfile({ displayName: name });
-    closeAuth();
-  } catch(err) {
-    showAuthError(friendlyError(err.code));
-  } finally {
-    setLoading('btn-signup', false, 'Create Account');
-  }
-}
-
-async function handleGoogleAuth() {
-  clearAuthMessages();
-  try {
-    await auth.signInWithPopup(googleProvider);
-    closeAuth();
-  } catch(err) {
-    if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
-      showAuthError(friendlyError(err.code));
-    }
-  }
-}
-
-async function handleForgotPassword() {
-  clearAuthMessages();
-  const email = document.getElementById('si-email').value.trim();
-  if (!email) { showAuthError('Enter your email above, then click "Forgot password".'); return; }
-  try {
-    await auth.sendPasswordResetEmail(email);
-    showAuthSuccess('Password reset email sent! Check your inbox.');
-  } catch(err) {
-    showAuthError(friendlyError(err.code));
-  }
-}
-
-async function signOutUser() {
-  closeDropdown();
-  await auth.signOut();
-}
-
-// ── Dropdown ──────────────────────────────────────────────────────────────────
-function toggleDropdown(e) {
-  e && e.stopPropagation();
-  document.getElementById('nav-dropdown').classList.toggle('open');
-}
-function closeDropdown() {
-  document.getElementById('nav-dropdown').classList.remove('open');
-}
-document.addEventListener('click', function(e) {
-  const zone = document.getElementById('nav-user');
-  if (zone && !zone.contains(e.target)) closeDropdown();
-});
-
-// ── Auth state observer ───────────────────────────────────────────────────────
-auth.onAuthStateChanged(function(user) {
-  const loginBtn  = document.getElementById('nav-login-btn');
-  const navUser   = document.getElementById('nav-user');
-  const navAvatar = document.getElementById('nav-avatar');
-  const navName   = document.getElementById('nav-user-name');
-  const ddEmail   = document.getElementById('nav-dd-email');
-
-  if (user) {
-    // ── Signed in ──
-    if (loginBtn) loginBtn.style.display = 'none';
-    navUser.classList.add('visible');
-
-    const displayName = user.displayName || user.email.split('@')[0] || 'User';
-    navName.textContent = displayName;
-    ddEmail.textContent = user.email;
-
-    if (user.photoURL) {
-      navAvatar.innerHTML =
-        '<img src="' + user.photoURL + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" alt="avatar">';
-    } else {
-      const initials = displayName.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase() || '?';
-      navAvatar.textContent = initials;
-    }
-  } else {
-    // ── Signed out ──
-    if (loginBtn) loginBtn.style.display = '';
-    navUser.classList.remove('visible');
-    navAvatar.textContent = '?';
-    navName.textContent   = '';
-  }
-});
-
-// ── Keyboard: close on Escape ─────────────────────────────────────────────────
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeAuth();
-});
-
-// ── Human-readable error messages ────────────────────────────────────────────
 function friendlyError(code) {
   var map = {
-    'auth/invalid-email':            'Please enter a valid email address.',
-    'auth/user-not-found':           'No account found with this email address.',
-    'auth/wrong-password':           'Incorrect password. Please try again.',
-    'auth/invalid-credential':       'Incorrect email or password. Please try again.',
-    'auth/email-already-in-use':     'An account with this email already exists. Try signing in.',
-    'auth/weak-password':            'Password should be at least 8 characters.',
-    'auth/too-many-requests':        'Too many failed attempts. Please wait a moment and try again.',
-    'auth/network-request-failed':   'Network error. Please check your internet connection.',
-    'auth/popup-blocked':            'Pop-up was blocked by your browser. Please allow pop-ups for this site.',
-    'auth/operation-not-allowed':    'This sign-in method is not enabled. Enable it in Firebase Console → Authentication.',
-    'auth/requires-recent-login':    'Please sign out and sign in again to continue.',
-    'auth/user-disabled':            'This account has been disabled. Contact support.',
+    'auth/invalid-email':          'Please enter a valid email address.',
+    'auth/user-not-found':         'No account found with this email address.',
+    'auth/wrong-password':         'Incorrect password. Please try again.',
+    'auth/invalid-credential':     'Incorrect email or password. Please try again.',
+    'auth/email-already-in-use':   'An account with this email already exists.',
+    'auth/weak-password':          'Password should be at least 8 characters.',
+    'auth/too-many-requests':      'Too many failed attempts. Please wait a moment.',
+    'auth/network-request-failed': 'Network error. Please check your connection.',
+    'auth/popup-blocked':          'Pop-up blocked. Please allow pop-ups for this site.',
+    'auth/operation-not-allowed':  'Sign-in method not enabled in Firebase Console.',
+    'auth/requires-recent-login':  'Please sign out and sign in again.',
+    'auth/user-disabled':          'This account has been disabled.',
   };
   return map[code] || 'Something went wrong (' + code + '). Please try again.';
 }
 
-/* ── FILE I/O HELPERS ── */
-function fioToast(msg, icon) {
-  var t = document.getElementById('fio-toast');
-  t.innerHTML = icon + ' ' + msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 3200);
+/* ============================================================
+   PERSONALIZED DEMO
+   ============================================================ */
+function ctaRequestDemo(e) {
+  e.preventDefault();
+  var email = document.getElementById('cta-email').value.trim();
+  var err   = document.getElementById('cta-err');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    err.textContent = 'Please enter a valid email address.'; return;
+  }
+  err.textContent = '';
+  document.getElementById('pdemo-email-label').textContent = email;
+  document.getElementById('pdemo-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  initPdemo();
 }
 
-function fioImport() {
-  var input = document.getElementById('fio-import-input');
-  input.onchange = function() {
-    var files = Array.from(input.files);
-    if (!files.length) return;
-    var names = files.map(function(f){ return f.name; }).join(', ');
-    fioToast('Importing: ' + names, '📥');
-    // Update the coordination log in the 3D panel
-    var log = document.getElementById('slog');
-    if (log) {
-      files.forEach(function(f) {
-        var row = document.createElement('div');
-        row.className = 'log-row';
-        row.style.cssText = 'display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.35rem';
-        row.innerHTML = '<span style="color:#22d3ee;font-size:0.7rem;white-space:nowrap;margin-top:1px">'
-          + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
-          + '</span><span style="color:rgba(255,255,255,0.75);font-size:0.78rem">📥 Imported <strong style="color:#fff">'
-          + f.name + '</strong></span>';
+function closePdemo() {
+  document.getElementById('pdemo-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (window._pdemoAnimId) { cancelAnimationFrame(window._pdemoAnimId); window._pdemoAnimId = null; }
+  if (window._pdemoLogTimer) { clearInterval(window._pdemoLogTimer); }
+}
+
+var pdemoScene, pdemoCamera, pdemoRenderer, pdemoMeshes = {};
+var pdemoRotating = true, pdemoInitDone = false;
+var pdemoDrag = false, pdemoRightDrag = false;
+var pdemoMouse = {x:0,y:0}, pdemoRot = {x:0.28, y:0.4};
+var pdemoZoom = 1, pdemoZoomTarget = 1, pdemoOffset = {x:0,y:0};
+
+function initPdemo() {
+  if (pdemoInitDone) { window._pdemoAnimId = requestAnimationFrame(pdemoLoop); return; }
+  pdemoInitDone = true;
+
+  var cv = document.getElementById('pdemo-canvas');
+  pdemoScene = new THREE.Scene();
+  pdemoScene.background = new THREE.Color(0x0b0620);
+  pdemoScene.fog = new THREE.Fog(0x0b0620, 18, 42);
+
+  pdemoCamera = new THREE.PerspectiveCamera(45, cv.clientWidth/cv.clientHeight, 0.1, 100);
+  pdemoCamera.position.set(0, 4, 14);
+  pdemoCamera.lookAt(0, 2, 0);
+
+  pdemoRenderer = new THREE.WebGLRenderer({canvas: cv, antialias: true});
+  pdemoRenderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  pdemoRenderer.shadowMap.enabled = true;
+  pdemoRenderer.setSize(cv.clientWidth, cv.clientHeight, false);
+
+  pdemoScene.add(new THREE.AmbientLight(0xffffff, 0.45));
+  var sun = new THREE.DirectionalLight(0xffffff, 1.1);
+  sun.position.set(8,14,8); sun.castShadow = true; pdemoScene.add(sun);
+  var fill = new THREE.DirectionalLight(0x7c3aed, 0.35);
+  fill.position.set(-6,4,-6); pdemoScene.add(fill);
+  var cpt = new THREE.PointLight(0x22d3ee, 0.65, 20);
+  cpt.position.set(3,6,3); pdemoScene.add(cpt);
+
+  pdemoScene.add(new THREE.GridHelper(30, 30, 0x251848, 0x1a1030));
+  var gnd = new THREE.Mesh(new THREE.PlaneGeometry(30,30),
+    new THREE.MeshLambertMaterial({color:0x100825,transparent:true,opacity:0.7}));
+  gnd.rotation.x = -Math.PI/2; gnd.position.y = -0.01; pdemoScene.add(gnd);
+
+  pdemoMeshes = {hvac:[],plumbing:[],fire:[],electrical:[],drain:[],structure:[]};
+
+  var FLOORS=4, FH=1.65, FW=6.0, FD=4.2;
+
+  function mk(geo, mat, x,y,z, rx,ry,rz, g) {
+    var m = new THREE.Mesh(geo, mat);
+    m.position.set(x,y,z);
+    if(rx) m.rotation.x=rx; if(rz) m.rotation.z=rz;
+    m.castShadow = true; pdemoScene.add(m); pdemoMeshes[g].push(m);
+  }
+  function bx(mat,y,z,w,h,d,g){ mk(new THREE.BoxGeometry(w,h,d),mat, 0,y,z, 0,0,0,g); }
+  function bz(mat,y,x,w,h,d,g){ mk(new THREE.BoxGeometry(d,h,w),mat, x,y,0, 0,0,0,g); }
+  function tx(mat,y,z,l,r,g){ mk(new THREE.CylinderGeometry(r,r,l,8),mat, 0,y,z, 0,0,Math.PI/2,g); }
+  function tz(mat,y,x,l,r,g){ mk(new THREE.CylinderGeometry(r,r,l,8),mat, x,y,0, Math.PI/2,0,0,g); }
+  function ty(mat,x,z,y0,y1,r,g){
+    var l=y1-y0; mk(new THREE.CylinderGeometry(r,r,l,8),mat, x,y0+l/2,z, 0,0,0,g);
+  }
+  function sp(mat,x,y,z,r,g){ mk(new THREE.SphereGeometry(r,7,7),mat, x,y,z, 0,0,0,g); }
+
+  /* --- STRUCTURE --- */
+  var cMat=new THREE.MeshLambertMaterial({color:0x90a4ae,transparent:true,opacity:0.55});
+  [[-FW,-FD],[-FW,0],[-FW,FD],[FW,-FD],[FW,0],[FW,FD],[0,-FD],[0,FD]].forEach(function(p){
+    for(var f=0;f<FLOORS;f++){
+      mk(new THREE.BoxGeometry(0.22,FH-0.06,0.22),cMat, p[0],f*FH+FH/2,p[1], 0,0,0,'structure');
+    }
+  });
+  for(var f=0;f<FLOORS;f++){
+    mk(new THREE.BoxGeometry(FW*2,0.1,FD*2),
+      new THREE.MeshLambertMaterial({color:0xb0bec5,transparent:true,opacity:0.28}),
+      0,f*FH,0, 0,0,0,'structure');
+  }
+
+  /* --- HVAC (cyan) --- */
+  var hM=new THREE.MeshLambertMaterial({color:0x00e5ff,transparent:true,opacity:0.85});
+  for(var f=0;f<FLOORS;f++){
+    var hy=f*FH+FH-0.35;
+    bx(hM,hy,-FD+0.9, FW*2-0.3,0.35,0.55,'hvac');
+    bx(hM,hy,FD-1.0,  FW*2-0.3,0.28,0.4,'hvac');
+    for(var bxi=-FW+1.2;bxi<FW;bxi+=1.8){ bz(hM,hy-0.04,bxi, 0.22,0.28,FD*1.6,'hvac'); }
+    ty(hM,-FW+0.5,-FD+0.6, f*FH,(f+1)*FH, 0.18,'hvac');
+  }
+
+  /* --- PLUMBING (magenta) --- */
+  var pM=new THREE.MeshLambertMaterial({color:0xe040fb,transparent:true,opacity:0.85});
+  for(var f=0;f<FLOORS;f++){
+    var py=f*FH+0.55;
+    tx(pM,py,-FD+0.45, FW*2-0.3,0.07,'plumbing');
+    tx(pM,py-0.18,-FD+0.7, FW*2-0.3,0.065,'plumbing');
+    for(var pxi=-FW+1.0;pxi<FW;pxi+=2.1){
+      tz(pM,py,pxi, FD*1.5,0.055,'plumbing');
+      sp(pM,pxi,py,0, 0.09,'plumbing');
+    }
+    ty(pM,FW-0.4,-FD+0.45, f*FH,(f+1)*FH, 0.07,'plumbing');
+  }
+
+  /* --- FIRE SUPPRESSION (red) --- */
+  var fM=new THREE.MeshLambertMaterial({color:0xf44336,transparent:true,opacity:0.85});
+  for(var f=0;f<FLOORS;f++){
+    var fy=f*FH+FH-0.22;
+    tx(fM,fy,0, FW*2-0.3,0.055,'fire');
+    tx(fM,fy,-FD+0.55, FW*2-0.3,0.05,'fire');
+    for(var sx=-FW+0.9;sx<FW;sx+=1.5){
+      for(var sz=-FD+0.8;sz<FD;sz+=1.6){
+        ty(fM,sx,sz, fy-0.22,fy, 0.025,'fire');
+        sp(fM,sx,fy-0.22,sz, 0.05,'fire');
+      }
+    }
+    ty(fM,FW-0.9,FD-0.5, f*FH,(f+1)*FH, 0.055,'fire');
+  }
+
+  /* --- ELECTRICAL (orange) --- */
+  var eM=new THREE.MeshLambertMaterial({color:0xff6e40,transparent:true,opacity:0.85});
+  for(var f=0;f<FLOORS;f++){
+    var ey=f*FH+FH-0.55;
+    bx(eM,ey,FD-0.5, FW*2-0.3,0.06,0.28,'electrical');
+    bz(eM,ey,FW-0.5, 0.06,0.28,FD*2-0.3,'electrical');
+    bz(eM,ey,0,      0.06,0.28,FD*2-0.3,'electrical');
+    tx(eM,ey-0.12,FD-0.65, FW*2-0.3,0.035,'electrical');
+    ty(eM,FW-0.7,FD-0.5, f*FH,(f+1)*FH, 0.04,'electrical');
+  }
+
+  /* --- DRAIN (green) --- */
+  var dM=new THREE.MeshLambertMaterial({color:0x66bb6a,transparent:true,opacity:0.85});
+  for(var f=0;f<FLOORS;f++){
+    var dy=f*FH+0.32;
+    tx(dM,dy,-FD+1.1, FW*2-0.3,0.075,'drain');
+    tz(dM,dy,-FW+0.7, FD*2-0.3,0.075,'drain');
+    for(var dxi=-FW+1.0;dxi<FW;dxi+=2.4){ sp(dM,dxi,dy,-FD+1.1, 0.09,'drain'); }
+    ty(dM,-FW+0.5,FD-0.5, f*FH,(f+1)*FH, 0.08,'drain');
+  }
+
+  /* Mouse controls */
+  cv.addEventListener('mousedown',function(ev){
+    if(ev.button===2) pdemoRightDrag=true; else {pdemoDrag=true; pdemoRotating=false;}
+    pdemoMouse.x=ev.clientX; pdemoMouse.y=ev.clientY;
+  });
+  cv.addEventListener('mousemove',function(ev){
+    var dx=ev.clientX-pdemoMouse.x, dy=ev.clientY-pdemoMouse.y;
+    pdemoMouse.x=ev.clientX; pdemoMouse.y=ev.clientY;
+    if(pdemoDrag){pdemoRot.y+=dx*0.008; pdemoRot.x+=dy*0.008;}
+    if(pdemoRightDrag){pdemoOffset.x+=dx*0.02; pdemoOffset.y-=dy*0.02;}
+  });
+  window.addEventListener('mouseup',function(){pdemoDrag=false;pdemoRightDrag=false;});
+  cv.addEventListener('wheel',function(ev){
+    ev.preventDefault();
+    pdemoZoomTarget=Math.max(0.35,Math.min(3.5,pdemoZoomTarget+ev.deltaY*0.003));
+  },{passive:false});
+  cv.addEventListener('contextmenu',function(ev){ev.preventDefault();});
+
+  /* Live log */
+  var logMsgs=[
+    ['HVAC','#00e5ff','Supply duct clearance clash FL-2 flagged'],
+    ['Plumbing','#e040fb','Hot water riser cleared - no conflicts'],
+    ['Fire','#f44336','Sprinkler head L3-07 conflicts with beam'],
+    ['Electrical','#ff6e40','Cable tray overlap resolved by AI'],
+    ['Drain','#66bb6a','Slope gradient verified on FL-1 drain'],
+    ['HVAC','#00e5ff','Return air duct rerouted +3cm clearance'],
+    ['Structure','#90a4ae','Column grid validated against IFC model'],
+    ['Plumbing','#e040fb','Cold water branch auto-assigned MEP-04'],
+  ];
+  var logIdx=0;
+  var logDiv=document.getElementById('pdemo-log');
+  function addLog(){
+    var e=logMsgs[logIdx++%logMsgs.length];
+    var row=document.createElement('div'); row.className='pdemo-log-row';
+    row.innerHTML='<span class="pdemo-log-time">'+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})
+      +'</span><span class="pdemo-log-msg"><span style="color:'+e[1]+';font-weight:700">'+e[0]+'</span> - '+e[2]+'</span>';
+    logDiv.prepend(row);
+    if(logDiv.children.length>12) logDiv.removeChild(logDiv.lastChild);
+  }
+  addLog();
+  window._pdemoLogTimer=setInterval(addLog,2500);
+
+  pdemoLoop();
+}
+
+function pdemoLoop(){
+  window._pdemoAnimId=requestAnimationFrame(pdemoLoop);
+  if(!pdemoRenderer) return;
+  pdemoZoom+=(pdemoZoomTarget-pdemoZoom)*0.1;
+  if(pdemoRotating) pdemoRot.y+=0.004;
+  var cosX=Math.cos(pdemoRot.x), sinX=Math.sin(pdemoRot.x);
+  var cosY=Math.cos(pdemoRot.y), sinY=Math.sin(pdemoRot.y);
+  pdemoCamera.position.set(
+    14*sinY*cosX*pdemoZoom+pdemoOffset.x,
+    14*sinX*pdemoZoom+2+pdemoOffset.y,
+    14*cosY*cosX*pdemoZoom
+  );
+  pdemoCamera.lookAt(pdemoOffset.x, 2+pdemoOffset.y, 0);
+  var cv=document.getElementById('pdemo-canvas');
+  if(cv&&(pdemoRenderer.domElement.width!==cv.clientWidth||pdemoRenderer.domElement.height!==cv.clientHeight)){
+    pdemoRenderer.setSize(cv.clientWidth,cv.clientHeight,false);
+    pdemoCamera.aspect=cv.clientWidth/cv.clientHeight;
+    pdemoCamera.updateProjectionMatrix();
+  }
+  pdemoRenderer.render(pdemoScene,pdemoCamera);
+}
+
+function pdemoToggle(trade,btn){
+  btn.classList.toggle('active');
+  var vis=btn.classList.contains('active');
+  (pdemoMeshes[trade]||[]).forEach(function(m){m.visible=vis;});
+}
+
+/* FILE I/O HELPERS */
+function fioToast(msg,icon){
+  var t=document.getElementById('fio-toast');
+  t.innerHTML=icon+' '+msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(function(){t.classList.remove('show');},3200);
+}
+function fioImport(){
+  var input=document.getElementById('fio-import-input');
+  input.onchange=function(){
+    var files=Array.from(input.files);
+    if(!files.length) return;
+    fioToast('Importing: '+files.map(function(f){return f.name;}).join(', '),'[IN]');
+    var log=document.getElementById('slog');
+    if(log){
+      files.forEach(function(f){
+        var row=document.createElement('div');
+        row.style.cssText='display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.35rem';
+        row.innerHTML='<span style="color:#22d3ee;font-size:0.7rem;white-space:nowrap;margin-top:1px">'
+          +new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})
+          +'</span><span style="color:rgba(255,255,255,0.75);font-size:0.78rem">Imported <strong style="color:#fff">'+f.name+'</strong></span>';
         log.prepend(row);
       });
     }
-    // Reset input so same file can be re-selected
-    input.value = '';
+    input.value='';
   };
   input.click();
 }
-
-function fioExport(format) {
-  var label = format.toUpperCase();
-  fioToast('Generating ' + label + ' report… Download will start shortly.', '📤');
-  setTimeout(function() {
-    // Build a minimal export payload as a text blob (demo)
-    var content = [
-      'FluxCoord AI — Coordination Export',
-      'Format: ' + label,
-      'Generated: ' + new Date().toLocaleString(),
-      '---',
-      'Hard Clashes: ' + (document.getElementById('clash-count')
-        ? document.getElementById('clash-count').textContent : '12'),
-      'Elements: ' + (document.getElementById('kpi-nodes')
-        ? document.getElementById('kpi-nodes').textContent : '247'),
-      'Status: ' + (document.getElementById('clash-status')
-        ? document.getElementById('clash-status').textContent : 'Review needed'),
-    ].join('\n');
-    var blob = new Blob([content], { type: 'text/plain' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'FluxCoord_Export_' + new Date().toISOString().slice(0,10) + '.' + format;
-    a.click();
-    URL.revokeObjectURL(a.href);
-    fioToast(label + ' export ready — check your downloads.', '✅');
-  }, 1200);
+function fioExport(format){
+  var label=format.toUpperCase();
+  fioToast('Generating '+label+' report...','[OUT]');
+  setTimeout(function(){
+    var content='FluxCoord AI Coordination Export\nFormat: '+label+'\nGenerated: '+new Date().toLocaleString()+'\n---\nHard Clashes: 12\nElements: 247';
+    var blob=new Blob([content],{type:'text/plain'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='FluxCoord_Export_'+new Date().toISOString().slice(0,10)+'.'+format;
+    a.click(); URL.revokeObjectURL(a.href);
+    fioToast(label+' export ready - check your downloads.','[OK]');
+  },1200);
 }
 </script>
 </body>
