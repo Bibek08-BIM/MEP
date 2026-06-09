@@ -259,6 +259,84 @@
     }
     @media(max-width:780px){ .demo3d-body { grid-template-columns: 1fr; } }
 
+    /* ── FILE I/O BAR ── */
+    .file-io-bar {
+      max-width: 1060px; margin: 1.25rem auto 0;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    @media(max-width:640px){ .file-io-bar { grid-template-columns: 1fr; } }
+
+    .fio-panel {
+      background: rgba(15,10,30,0.85);
+      border: 1px solid rgba(139,92,246,0.22);
+      border-radius: 14px;
+      padding: 1rem 1.25rem 1.1rem;
+      backdrop-filter: blur(10px);
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+    .fio-panel:hover {
+      border-color: rgba(139,92,246,0.5);
+      box-shadow: 0 0 28px rgba(124,58,237,0.14);
+    }
+    .fio-header {
+      display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.75rem;
+    }
+    .fio-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; flex-shrink: 0;
+    }
+    .fio-icon.import { background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.3); }
+    .fio-icon.export { background: rgba(124,58,237,0.14); border: 1px solid rgba(124,58,237,0.35); }
+    .fio-title {
+      font-size: 0.88rem; font-weight: 700; color: #fff; letter-spacing: 0.01em;
+    }
+    .fio-sub {
+      font-size: 0.72rem; color: rgba(255,255,255,0.4); margin-top: 1px;
+    }
+    .fio-chips {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.9rem;
+    }
+    .fio-chip {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+      padding: 0.22rem 0.6rem; border-radius: 6px; font-family: monospace;
+    }
+    .fio-chip.import {
+      background: rgba(34,211,238,0.1); border: 1px solid rgba(34,211,238,0.28);
+      color: #22d3ee;
+    }
+    .fio-chip.export {
+      background: rgba(167,139,250,0.1); border: 1px solid rgba(167,139,250,0.3);
+      color: #a78bfa;
+    }
+    .fio-btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.48rem 1.15rem; border-radius: 9px;
+      font-size: 0.82rem; font-weight: 700; cursor: pointer; border: none;
+      transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+      width: 100%; justify-content: center; letter-spacing: 0.01em;
+    }
+    .fio-btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
+    .fio-btn:active { transform: translateY(0); }
+    .fio-btn.import {
+      background: linear-gradient(135deg, #0891b2, #22d3ee);
+      color: #fff; box-shadow: 0 4px 16px rgba(34,211,238,0.25);
+    }
+    .fio-btn.export {
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+      color: #fff; box-shadow: 0 4px 16px rgba(124,58,237,0.3);
+    }
+    .fio-input { display: none; }
+    /* toast notification */
+    .fio-toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: rgba(15,10,30,0.95); border: 1px solid rgba(139,92,246,0.4);
+      color: #fff; font-size: 0.85rem; padding: 0.65rem 1.4rem;
+      border-radius: 999px; z-index: 9999; transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+      opacity: 0; pointer-events: none; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .fio-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
     #three-canvas-wrap {
       position: relative; background: transparent; cursor: grab;
     }
@@ -1145,6 +1223,67 @@
       </div>
     </div>
   </div>
+
+  <!-- ── FILE IMPORT / EXPORT BAR ── -->
+  <div class="file-io-bar">
+
+    <!-- IMPORT -->
+    <div class="fio-panel">
+      <div class="fio-header">
+        <div class="fio-icon import">📥</div>
+        <div>
+          <div class="fio-title">Import BIM Model</div>
+          <div class="fio-sub">Supported file formats</div>
+        </div>
+      </div>
+      <div class="fio-chips">
+        <span class="fio-chip import">.rvt</span>
+        <span class="fio-chip import">.nwc</span>
+        <span class="fio-chip import">.acd</span>
+        <span class="fio-chip import">.nwd</span>
+        <span class="fio-chip import">.pdf</span>
+      </div>
+      <input class="fio-input" id="fio-import-input" type="file"
+             accept=".rvt,.nwc,.acd,.nwd,.pdf" multiple />
+      <button class="fio-btn import" onclick="fioImport()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Import File
+      </button>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="fio-panel">
+      <div class="fio-header">
+        <div class="fio-icon export">📤</div>
+        <div>
+          <div class="fio-title">Export Coordination Report</div>
+          <div class="fio-sub">Available export formats</div>
+        </div>
+      </div>
+      <div class="fio-chips">
+        <span class="fio-chip export">.rvt</span>
+        <span class="fio-chip export">.nwc</span>
+        <span class="fio-chip export">.acd</span>
+        <span class="fio-chip export">.nwd</span>
+        <span class="fio-chip export">.pdf</span>
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="fio-btn export" style="flex:1;min-width:120px" onclick="fioExport('pdf')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Export as PDF
+        </button>
+        <button class="fio-btn export" style="flex:1;min-width:120px;background:linear-gradient(135deg,#065a82,#1c7293)" onclick="fioExport('nwd')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Export as NWD
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast notification -->
+  <div class="fio-toast" id="fio-toast"></div>
+
 </section>
 
 <!-- STATS -->
@@ -1488,12 +1627,6 @@
     <a href="#about">About</a>
     <a href="#features">Features</a>
     <a href="#cta">Contact</a>
-    <div style="font-size: 1.1em; line-height: 1.8;">
-        <p><strong>Name:</strong> Er.Bibek Neupane</p>
-        <p><strong>Designation:</strong> CEO</p>
-        <p><strong>Email:</strong> <a href="mailto:yourname@gmail.com" style="color: #8a2be2;"><bibek class="8 neupane"></bibek>bibek.8.neupane@gmail.com</a></p>
-    </div>
-</section>
   </div>
 </footer>
 
@@ -2160,6 +2293,69 @@ function friendlyError(code) {
     'auth/user-disabled':            'This account has been disabled. Contact support.',
   };
   return map[code] || 'Something went wrong (' + code + '). Please try again.';
+}
+
+/* ── FILE I/O HELPERS ── */
+function fioToast(msg, icon) {
+  var t = document.getElementById('fio-toast');
+  t.innerHTML = icon + ' ' + msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function(){ t.classList.remove('show'); }, 3200);
+}
+
+function fioImport() {
+  var input = document.getElementById('fio-import-input');
+  input.onchange = function() {
+    var files = Array.from(input.files);
+    if (!files.length) return;
+    var names = files.map(function(f){ return f.name; }).join(', ');
+    fioToast('Importing: ' + names, '📥');
+    // Update the coordination log in the 3D panel
+    var log = document.getElementById('slog');
+    if (log) {
+      files.forEach(function(f) {
+        var row = document.createElement('div');
+        row.className = 'log-row';
+        row.style.cssText = 'display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:0.35rem';
+        row.innerHTML = '<span style="color:#22d3ee;font-size:0.7rem;white-space:nowrap;margin-top:1px">'
+          + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})
+          + '</span><span style="color:rgba(255,255,255,0.75);font-size:0.78rem">📥 Imported <strong style="color:#fff">'
+          + f.name + '</strong></span>';
+        log.prepend(row);
+      });
+    }
+    // Reset input so same file can be re-selected
+    input.value = '';
+  };
+  input.click();
+}
+
+function fioExport(format) {
+  var label = format.toUpperCase();
+  fioToast('Generating ' + label + ' report… Download will start shortly.', '📤');
+  setTimeout(function() {
+    // Build a minimal export payload as a text blob (demo)
+    var content = [
+      'FluxCoord AI — Coordination Export',
+      'Format: ' + label,
+      'Generated: ' + new Date().toLocaleString(),
+      '---',
+      'Hard Clashes: ' + (document.getElementById('clash-count')
+        ? document.getElementById('clash-count').textContent : '12'),
+      'Elements: ' + (document.getElementById('kpi-nodes')
+        ? document.getElementById('kpi-nodes').textContent : '247'),
+      'Status: ' + (document.getElementById('clash-status')
+        ? document.getElementById('clash-status').textContent : 'Review needed'),
+    ].join('\n');
+    var blob = new Blob([content], { type: 'text/plain' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'FluxCoord_Export_' + new Date().toISOString().slice(0,10) + '.' + format;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    fioToast(label + ' export ready — check your downloads.', '✅');
+  }, 1200);
 }
 </script>
 </body>
